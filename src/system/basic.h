@@ -9,6 +9,7 @@
 #define cToHStr(str) (str).toStdString().c_str()
 
 #define myDebug qDebug().noquote()
+#define myInfo qInfo().noquote()
 
 #ifdef Trace
 #define trace(qDebugMsg) myDebug << "trace:" << qDebugMsg

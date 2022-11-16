@@ -74,7 +74,7 @@ set(srcCpp
 # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_executable(${PROJECT_NAME}
-    WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
+    # WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
     ${paraServerCpp}
     main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort uiLib halLib sysLib halconProcessLib paraLib) # Qt5 Shared Library

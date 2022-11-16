@@ -11,6 +11,7 @@
 #include <QDateTime>
 #include <QProcess>
 #include <QApplication>
+#include "hal/vm.h"
 
 void logOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
@@ -32,6 +33,7 @@ protected:
 
 protected:
     QStringList m_msgBuffer;
+    CVM* m_pVm;
 };
 
 CVmControl::CVmControl()
@@ -41,11 +43,13 @@ CVmControl::CVmControl()
 
 CVmControl::~CVmControl()
 {
+    delPtr(m_pVm);
     qWarning() << cnStr("程序结束");
 }
 
 void CVmControl::init()
 {
+    m_pVm = new CVM;
     qWarning() << cnStr("程序开始");
 }
 
