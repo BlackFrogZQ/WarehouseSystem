@@ -1,0 +1,7 @@
+build/*
+LogFile/*
+.vscode/*
+log/*
+lib/halcon12x64/halcon.dll
+xmlDataFileAll.xml
+lib/halcon12x64/halconxl.dll
