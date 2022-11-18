@@ -1,10 +1,10 @@
 ﻿#include "para/define/paraDef.h"
 #include "para/define/paraNode.h"
-#include "pcDef.h"
+#include "cameraLzDef.h"
 
 using namespace TIGER_ParaDef;
 
-namespace TIGER_PCDef
+namespace TIGER_CameraLzDef
 {
     static CCameraParaLz g_cameraParaParas;
     CCameraParaLz* cameraParasLz()
@@ -15,7 +15,7 @@ namespace TIGER_PCDef
     class CCameraDefParasLz : public CParas
     {
     public:
-        CCameraDefParasLz(): CParas(cnStr("camera"), cnStr("相机B参数"), true)
+        CCameraDefParasLz(): CParas(cnStr("camera"), cnStr("螺柱相机参数"), true)
         {
             m_currentNode->appendNode({pntString, "ip", cnStr("ip"), true}, &(cameraParasLz()->ip));
             m_currentNode->appendNode({pntInt, "exposureTime", cnStr("初始曝光时间"), false}, &(cameraParasLz()->exposureTime));

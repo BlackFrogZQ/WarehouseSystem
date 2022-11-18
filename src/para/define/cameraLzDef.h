@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <QString>
-namespace TIGER_PCDef
+namespace TIGER_CameraLzDef
 {
 	struct CCameraParaLz
 	{

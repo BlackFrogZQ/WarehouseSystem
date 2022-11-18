@@ -2,6 +2,7 @@
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
 #include "system/tool/halconTool.h"
+#include "system/basic.h"
 #include "imageProcess/createRoi/createRoi.h"
 #include "imageProcess/discernDirection/iDiscernDirection.h"
 #include "imageProcess/imageProcess.h"
@@ -20,21 +21,20 @@ CMainWindow *mainWindow()
 };
 
 CMainWindow::CMainWindow(QWidget *parent)
-    : QDialog(parent), m_drawWindowHandle(cDefHandleValue), m_showYcg(true)
+    : QDialog(parent)
 {
     g_pMainWindow = this;
-    this->setWindowTitle("TestVision");
-    setFixedSize(1100, 800);
-    m_controlWidget = NULL;
-    m_controlWidget = new ControlWidget();
+    setFixedSize(1920, 1080);// 1626 1236
+    m_controlWidget = new ControlWidget;
+    m_plcStateLed = new CPlcStateLed;
     initLayout();
-    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
-    setWindowFlags(windowFlags()&~Qt::WindowContextHelpButtonHint&~Qt::WindowMaximizeButtonHint);
+    mainWindow()->slotVideoImage(baslerCamera()->getExposureTime(), baslerCameraLz()->getExposureTime());
+    connect(baslerCamera(), &TIGER_BaslerCamera::CBaslerCamera::sigGrabImage, this, &CMainWindow::slotUpdateYcgImage);
+    connect(baslerCameraLz(), &TIGER_BaslerCamera::CBaslerCameraLz::sigGrabImage, this, &CMainWindow::slotUpdateLzImage);
 }
 
 CMainWindow::~CMainWindow()
 {
-    delPtr(m_pImageLabel);
     delPtr(m_pOutMsg);
     delPtr(m_controlWidget);
 }
@@ -47,83 +47,47 @@ void CMainWindow::printMsg(QString p_msg)
 
 void CMainWindow::initLayout()
 {
-    m_pImageLabel = new QLabel;
-    m_pImageLabel->setScaledContents(true);
-    m_pImageLabel->setStyleSheet(cStyleSheet);
-
+    //图像窗口
     m_ycgImageLabel = new QLabel;
-    m_lzImageLabel = new QLabel;
-    m_ycgImageLabel->installEventFilter(this);
-    m_lzImageLabel->installEventFilter(this);
-    m_ycgImageLabel->setScaledContents(true);
-    m_lzImageLabel->setScaledContents(true);
     m_ycgImageLabel->setStyleSheet(cStyleSheet);
+    m_ycgImageLabel->setFixedSize(950,722);
+    m_lzImageLabel = new QLabel;
     m_lzImageLabel->setStyleSheet(cStyleSheet);
-    QWidget *widgetTwoImage = new QWidget;
-    QHBoxLayout *pLayoutTwoImage = new QHBoxLayout;
-    QSpacerItem * sparcer_item = new QSpacerItem(400, 0, QSizePolicy::Fixed, QSizePolicy::Expanding);
-    pLayoutTwoImage->addItem(sparcer_item);
-    pLayoutTwoImage->addWidget(m_ycgImageLabel);
-    pLayoutTwoImage->addWidget(m_lzImageLabel);
-    pLayoutTwoImage->setMargin(2);
-    widgetTwoImage->setLayout(pLayoutTwoImage);
-    widgetTwoImage->setFixedHeight(100);
+    m_lzImageLabel->setFixedSize(m_ycgImageLabel->size());
 
     QWidget *widgetAllImage = new QWidget;
-    QVBoxLayout *pLayoutAllImage = new QVBoxLayout;
-    pLayoutAllImage->addWidget(m_pImageLabel);
-    pLayoutAllImage->addWidget(widgetTwoImage);
-    pLayoutAllImage->setMargin(2);
-    pLayoutAllImage->setSpacing(1);
-    widgetAllImage->setObjectName("widgetAllImage");
-    widgetAllImage->setStyleSheet(cWindowStyleSheet);
+    QHBoxLayout *pLayoutAllImage = new QHBoxLayout;
+    pLayoutAllImage->addWidget(m_ycgImageLabel);
+    pLayoutAllImage->addWidget(m_lzImageLabel);
+    pLayoutAllImage->setMargin(0);
+    pLayoutAllImage->setSpacing(2);
+    widgetAllImage->setStyleSheet(cStyleSheet);
     widgetAllImage->setLayout(pLayoutAllImage);
 
+    //输入输出窗口
     m_pOutMsg = new QTextBrowser;
     m_pOutMsg->setOpenLinks(false);
     m_pOutMsg->setOpenExternalLinks(false);
     m_pOutMsg->setStyleSheet(cStyleSheet);
-    m_pOutMsg->setFixedHeight(200);
-    m_pOutMsg->document()->setMaximumBlockCount(300);
+    m_pOutMsg->setFixedWidth(m_ycgImageLabel->width());
 
+    QWidget *controlWidget = new QWidget;
+    QHBoxLayout *pControlLayout = new QHBoxLayout;
+    m_plcStateLed->setStyleSheet(cStyleSheet);
+    pControlLayout->addWidget(m_pOutMsg);
+    pControlLayout->addWidget(m_plcStateLed);
+    pControlLayout->addWidget(m_controlWidget);
+    pControlLayout->setMargin(0);
+    pControlLayout->setSpacing(10);
+    controlWidget->setLayout(pControlLayout);
+
+    //汇总
     QVBoxLayout *pLayoutImgeAndOUtMsg = new QVBoxLayout;
     pLayoutImgeAndOUtMsg->addWidget(widgetAllImage);
-    pLayoutImgeAndOUtMsg->addWidget(m_pOutMsg);
-    pLayoutImgeAndOUtMsg->setMargin(2);
-    pLayoutImgeAndOUtMsg->setSpacing(10);
-    QWidget *widgetImgeAndOUtMsg = new QWidget;
-    widgetImgeAndOUtMsg->setLayout(pLayoutImgeAndOUtMsg);
-
-    QWidget *widgetMainWindow = new QWidget;
-    m_controlWidget->setFixedWidth(400);
-    QHBoxLayout *pLayoutMainWindow = new QHBoxLayout;
-    pLayoutMainWindow->addWidget(widgetImgeAndOUtMsg);
-    pLayoutMainWindow->addWidget(m_controlWidget);
-    widgetMainWindow->setLayout(pLayoutMainWindow);
-    this->setLayout(pLayoutMainWindow);
-
-    connect(baslerCamera(), &TIGER_BaslerCamera::CBaslerCamera::sigGrabImage, this, &CMainWindow::slotUpdateYcgImage);
-    connect(baslerCameraLz(), &TIGER_BaslerCamera::CBaslerCameraLz::sigGrabImage, this, &CMainWindow::slotUpdateLzImage);
-}
-
-void CMainWindow::slotUpdateYcgImage(const QImage &p_image)
-{
-    m_ycgImage = p_image;
-    if(m_showYcg == true)
-    {
-        m_pImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_pImageLabel->size(), Qt::KeepAspectRatio));
-    }
-    m_ycgImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_ycgImageLabel->size(), Qt::KeepAspectRatio));
-}
-
-void CMainWindow::slotUpdateLzImage(const QImage &p_image)
-{
-    m_lzImage = p_image;
-    if(m_showYcg == false)
-    {
-        m_pImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_pImageLabel->size(), Qt::KeepAspectRatio));
-    }
-    m_lzImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_lzImageLabel->size(), Qt::KeepAspectRatio));
+    pLayoutImgeAndOUtMsg->addWidget(controlWidget);
+    pLayoutImgeAndOUtMsg->setMargin(10);
+    pLayoutImgeAndOUtMsg->setSpacing(2);
+    this->setLayout(pLayoutImgeAndOUtMsg);
 }
 
 void CMainWindow::slotVideoImage(double p_YcgExposureTime, double p_LzExposureTime)
@@ -131,17 +95,22 @@ void CMainWindow::slotVideoImage(double p_YcgExposureTime, double p_LzExposureTi
     baslerCamera()->setExposureTime(p_YcgExposureTime);
     if (!(baslerCamera()->connected() && baslerCamera()->acquireChange()))
     {
-        qInfo() << cnStr("相机打开失败:%1").arg(baslerCamera()->getLastError());
+        qInfo() << cnStr("延长杆相机打开失败:%1").arg(baslerCamera()->getLastError());
     }
-
     baslerCameraLz()->setExposureTime(p_LzExposureTime);
     if (!(baslerCameraLz()->connected() && baslerCameraLz()->acquireChange()))
     {
-        qInfo() << cnStr("相机打开失败:%1").arg(baslerCameraLz()->getLastError());
+        qInfo() << cnStr("螺柱相机打开失败:%1").arg(baslerCameraLz()->getLastError());
     }
 }
 
-void CMainWindow::slotGrabImage()
+void CMainWindow::slotUpdateYcgImage(const QImage &p_image)
+{
+    m_ycgImage = p_image;
+    m_ycgImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_ycgImageLabel->size(), Qt::KeepAspectRatio));
+}
+
+void CMainWindow::slotGrabYcgImage()
 {
     if (baslerCamera()->isAcquire())
     {
@@ -159,7 +128,36 @@ void CMainWindow::slotGrabImage()
     {
         qInfo() << cnStr("相机采集失败，无法拍照识别");
     }
+    slotUpdateYcgImage(baslerCamera()->getLastImage());
+}
 
+bool CMainWindow::slotYcgImageDiscern(bool &p_direction)
+{
+    TIGER_ProcessTool::CStationMatch stationMatch;
+    if (stationMatch.processImage(true))
+    {
+        myInfo << cnStr("延长杆处理成功。");
+    }
+    else
+    {
+        slotUpdateYcgImage(stationMatch.getMarkImage());
+        qInfo() << cnStr("延长杆处理失败：%1").arg(stationMatch.getErrorMsg());
+        return false;
+    }
+    p_direction = stationMatch.getDirection();
+    myInfo << p_direction;
+    return true;
+}
+
+
+void CMainWindow::slotUpdateLzImage(const QImage &p_image)
+{
+    m_lzImage = p_image;
+    m_lzImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_lzImageLabel->size(), Qt::KeepAspectRatio));
+}
+
+void CMainWindow::slotGrabLzImage()
+{
     if (baslerCameraLz()->isAcquire())
     {
         qInfo() << cnStr("相机正在采集，正在尝试停止相机采集");
@@ -176,94 +174,20 @@ void CMainWindow::slotGrabImage()
     {
         qInfo() << cnStr("相机采集失败，无法拍照识别");
     }
-
-    slotUpdateYcgImage(baslerCamera()->getLastImage());
     slotUpdateLzImage(baslerCameraLz()->getLastImage());
 }
 
-void CMainWindow::drawRectangle2Region()
+bool CMainWindow::slotLzImageDiscern(bool &p_direction)
 {
-    setWidgetHandle(m_drawWindowHandle, m_pImageLabel);
-    slotGrabImage();
-    CCreateRoi createRoi;
-    if(!createRoi.createRoi(m_drawWindowHandle, m_showYcg))
-    {
-        qInfo() << cnStr("保存失败:1%").arg(createRoi.getErrorMsg());
-    }
-}
-
-bool CMainWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    if(obj == m_ycgImageLabel)
-    {
-        if (event->type() == QEvent::MouseButtonPress)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton)
-            {
-                m_showYcg = true;
-                slotUpdateYcgImage(m_ycgImage);
-                qInfo() << cnStr("主窗口显示的是延长杆");
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-    else if(obj == m_lzImageLabel)
-    {
-        if (event->type() == QEvent::MouseButtonPress)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton)
-            {
-                m_showYcg = false;
-                slotUpdateLzImage(m_lzImage);
-                qInfo() << cnStr("主窗口显示的是螺柱");
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-    return QWidget::eventFilter(obj, event);
-}
-
-bool CMainWindow::slotImageDiscern(const bool &p_useWindow, const bool &p_processYcg, bool &p_direction)
-{
-    if(p_useWindow == false)
-    {
-        m_showYcg = p_processYcg;
-    }
-
     TIGER_ProcessTool::CStationMatch stationMatch;
-    if (stationMatch.processImage(m_showYcg))
+    if (stationMatch.processImage(false))
     {
-        if(m_showYcg == true)
-        {
-            qInfo() << cnStr("延长杆处理成功。");
-        }
-        else
-        {
-            qInfo() << cnStr("螺柱处理成功。");
-        }
+        qInfo() << cnStr("螺柱处理成功。");
     }
     else
     {
-        if(m_showYcg == true)
-        {
-            slotUpdateYcgImage(stationMatch.getMarkImage());
-            qInfo() << cnStr("延长杆处理失败：%1").arg(stationMatch.getErrorMsg());
-        }
-        else
-        {
-            slotUpdateLzImage(stationMatch.getMarkImage());
-            qInfo() << cnStr("螺柱处理失败：%1").arg(stationMatch.getErrorMsg());
-        }
+        slotUpdateLzImage(stationMatch.getMarkImage());
+        qInfo() << cnStr("螺柱处理失败：%1").arg(stationMatch.getErrorMsg());
         return false;
     }
     p_direction = stationMatch.getDirection();

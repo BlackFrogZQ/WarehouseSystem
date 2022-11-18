@@ -1,6 +1,8 @@
 #pragma once
 #include "../iActionState.h"
+#include "discernDirectionDef.h"
 class CAutoWorkAction;
+
 class CAutoWorkIdleState:public IActionState
 {
     Q_OBJECT
@@ -50,6 +52,7 @@ public:
     virtual void runing() override;
 };
 
+
 class CWaitLZVision:public CAutoWorkIdleState
 {
     Q_OBJECT
@@ -67,7 +70,6 @@ public:
     virtual void run() override;
     virtual void runing() override;
 };
-
 
 class CWaitLZAction:public CAutoWorkIdleState
 {

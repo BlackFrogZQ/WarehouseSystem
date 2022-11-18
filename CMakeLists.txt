@@ -63,7 +63,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/imageProcess)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/para)
 set(paraServerCpp
     src/para/define/paraDef.cpp
-    src/para/define/pcDef.cpp
+    src/para/define/cameraLzDef.cpp
     src/para/define/cameraDef.cpp)
 
 set(srcCpp
@@ -77,7 +77,7 @@ add_executable(${PROJECT_NAME}
     # WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
     ${paraServerCpp}
     main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort uiLib halLib sysLib halconProcessLib paraLib) # Qt5 Shared Library
+target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort halLib sysLib halconProcessLib paraLib uiLib) # Qt5 Shared Library
 
 if(DEFINED CMAKE_BUILD_TYPE)
     set(exeDir ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})

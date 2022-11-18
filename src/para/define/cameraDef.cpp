@@ -15,7 +15,7 @@ namespace TIGER_CameraDef
     class CCameraDefParas : public CParas
     {
     public:
-        CCameraDefParas() : CParas(cnStr("cameraPara"), cnStr("相机参数"), true)
+        CCameraDefParas() : CParas(cnStr("cameraPara"), cnStr("延长杆相机参数"), true)
         {
             m_currentNode->appendNode({pntString, "ip", cnStr("ip"), true}, &(cameraParas()->ip));
             m_currentNode->appendNode({pntInt, "exposureTime", cnStr("初始曝光时间"), false}, &(cameraParas()->exposureTime));

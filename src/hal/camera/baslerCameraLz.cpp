@@ -255,7 +255,7 @@ namespace TIGER_BaslerCamera
             m_isConnected = true;
             return;
         }
-        qInfo() << cnStr("相机连接失败:%1,5s后尝试连接相机").arg(getLastError());
+        // qInfo() << cnStr("相机连接失败:%1,5s后尝试连接相机").arg(getLastError());
         QTimer::singleShot(5000, this, &CBaslerCameraLz::slotDisconnected);
     }
 

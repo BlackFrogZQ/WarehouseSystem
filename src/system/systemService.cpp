@@ -5,7 +5,7 @@
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
 #include "para/define/cameraDef.h"
-#include "para/define/pcDef.h"
+#include "para/define/cameraLzDef.h"
 #include "ui/mainWindow.h"
 #include <HalconCpp.h>
 #include <QDateTime>
@@ -122,14 +122,14 @@ void initSystemService()
     ((CVmControl *)g_sysService)->init();
     baslerCamera()->setIP(TIGER_CameraDef::cameraParas()->ip);
     baslerCamera()->setExposureTime(TIGER_CameraDef::cameraParas()->exposureTime);
-    baslerCameraLz()->setIP(TIGER_PCDef::cameraParasLz()->ip);
-    baslerCameraLz()->setExposureTime(TIGER_PCDef::cameraParasLz()->exposureTime);
+    baslerCameraLz()->setIP(TIGER_CameraLzDef::cameraParasLz()->ip);
+    baslerCameraLz()->setExposureTime(TIGER_CameraLzDef::cameraParasLz()->exposureTime);
 }
 
 void closeSystemService()
 {
     TIGER_CameraDef::cameraParas()->exposureTime = baslerCamera()->getExposureTime();
-    TIGER_PCDef::cameraParasLz()->exposureTime = baslerCameraLz()->getExposureTime();
+    TIGER_CameraLzDef::cameraParasLz()->exposureTime = baslerCameraLz()->getExposureTime();
     sys()->save();
     delete g_sysService;
     g_sysService = nullptr;

@@ -1,5 +1,7 @@
 ﻿#include "autoWorkState.h"
 #include "autoWorkAction.h"
+#include "ui/mainWindow.h"
+#include "hal/camera/baslerCameraLz.h"
 #include "hal/communication/plcSigDef.h"
 #include "hal/vm.h"
 #include <QTimer>
@@ -7,7 +9,7 @@
 void CSendRunType::run()
 {
     assert(masterData()->colis(cpcAuotRun) == false);
-    vm()->sendHold(cphRunType,m_action->m_runType);
+    vm()->sendHold(cphRunType, m_action->m_runType);
     QTimer::singleShot(10, this, [this]{ runing(); });
 }
 void CSendRunType::runing()
@@ -36,8 +38,7 @@ void CSendRunType::runing()
 
 void CWaitLZVision::run()
 {
-    QTimer::singleShot(10, this, [this]
-                       { runing(); });
+    QTimer::singleShot(10, this, [this]{ runing(); });
 }
 void CWaitLZVision::runing()
 {
@@ -57,12 +58,12 @@ void CWaitLZVision::runing()
     }
 }
 
+
 void CLZVision::run()
 {
     assert(masterData()->colis(cpcLZVision) == true);
     vm()->sendDisColis(cpdcLZVision, true);
-    QTimer::singleShot(10, this, [this]
-                       { runing(); });
+    QTimer::singleShot(10, this, [this]{ runing(); });
 }
 void CLZVision::runing()
 {
@@ -75,16 +76,21 @@ void CLZVision::runing()
     if (masterData()->colis(cpcLZVision) == false)
     {
         myInfo << cnStr("识别螺柱中");
-        // TODO 识别
-        vm()->sendHold(cphLZType, 1);
+        CDiscernDirection lzType = cddPoseError;
+        bool direction;
+        if(mainWindow()->slotLzImageDiscern(direction))
+        {
+            lzType = direction ? cddNegativeDirection: cddPositiveDirection;
+        }
+        vm()->sendHold(cphLZType, lzType);
         changeState(m_action->m_waitLZAction);
     }
     else
     {
-        QTimer::singleShot(10, this, [this]
-                           { runing(); });
+        QTimer::singleShot(10, this, [this]{ runing(); });
     }
 }
+
 
 void CWaitLZAction::run()
 {
@@ -119,6 +125,5 @@ void CWaitLZAction::runing()
             }
         }
     }
-    QTimer::singleShot(10, this, [this]
-                       { runing(); });
+    QTimer::singleShot(10, this, [this]{ runing(); });
 }

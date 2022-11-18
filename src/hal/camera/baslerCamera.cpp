@@ -39,7 +39,7 @@ namespace TIGER_BaslerCamera
           m_heartbeatTimeout(1000)
     {
         PylonInitialize();
-        m_pGigECamera = new CBaslerGigEInstantCamera(nullptr);
+        m_pGigECamera = new CBaslerGigEInstantCamera;
         CImageEvent *sampleImageEventHandler = new CImageEvent;
         connect(sampleImageEventHandler, &CImageEvent::sigGrabImage, this, &CBaslerCamera::slotGrabImage);
         m_pGigECamera->RegisterImageEventHandler(sampleImageEventHandler, RegistrationMode_ReplaceAll, Cleanup_Delete);
@@ -256,7 +256,7 @@ namespace TIGER_BaslerCamera
             m_isConnected = true;
             return;
         }
-        qInfo() << cnStr("相机连接失败:%1,5s后尝试连接相机").arg(getLastError());
+        // qInfo() << cnStr("相机连接失败:%1,5s后尝试连接相机").arg(getLastError());
         QTimer::singleShot(5000, this, &CBaslerCamera::slotDisconnected);
     }
 

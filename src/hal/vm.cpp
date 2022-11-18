@@ -1,6 +1,7 @@
 ﻿#include "vm.h"
 #include "communication/modbusMaster.h"
 #include "action/iAction.h"
+
 static CVM *g_Vm = nullptr;
 CVM *vm()
 {
@@ -16,20 +17,22 @@ CVM::CVM(QObject *p)
 {
     g_Vm = this;
     m_pMaster = new CModbusMaster(this);
+    connect(m_pMaster,&CModbusMaster::sigDataUpdate,this,&CVM::sigPlcSigUpdate);
+
     CActionCreater creater(this);
     m_pResetAction = creater.resetAction();
     m_pAutoWorkAction = creater.autoWorkAction();
-    connect(m_pResetAction, &IAction::sigEnd, [this]
-            {
+    connect(m_pResetAction, &IAction::sigEnd, [this]{
         if(m_state == vmReset)
         {
             changeState(vmIdle);
         } });
-    connect(m_pAutoWorkAction, &IAction::sigEnd, [this]
-            {if(m_state == vmAutoWork)
+    connect(m_pAutoWorkAction, &IAction::sigEnd, [this]{
+        if(m_state == vmAutoWork)
         {
             changeState(vmIdle);
         } });
+
     const auto cIP = "127.0.0.1";
     const auto cPort = 502;
     const auto cAddr = 255;
@@ -38,14 +41,18 @@ CVM::CVM(QObject *p)
     myInfo << (successful ? cnStr("服务器创建成功") : cnStr("服务器创建失败"));
     if (successful)
     {
-        autoWork();
+        reset();
     }
 }
 
 CVM::~CVM()
 {
-    delPtr(m_pAutoWorkAction);
     delPtr(m_pResetAction);
+    delPtr(m_pAutoWorkAction);
+}
+CVMState CVM::vmState() const
+{
+    return m_state;
 }
 
 bool CVM::sendDisColis(int p_addr, bool p_value)
@@ -70,16 +77,16 @@ void CVM::stoReset()
     m_pResetAction->stop();
 }
 
-void CVM::stopWork()
-{
-    assert(m_state == vmAutoWork);
-    m_pAutoWorkAction->stop();
-}
-
 void CVM::autoWork()
 {
     changeState(vmAutoWork);
     m_pAutoWorkAction->start();
+}
+
+void CVM::stopWork()
+{
+    assert(m_state == vmAutoWork);
+    m_pAutoWorkAction->stop();
 }
 
 void CVM::changeState(CVMState nextState)

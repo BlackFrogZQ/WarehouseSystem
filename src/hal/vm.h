@@ -15,10 +15,11 @@ public:
     void autoWork();
     void stopWork();
 
-    CVMState state() const;
+    CVMState vmState() const;
 
 signals:
     void sigVMStateUpdate();
+    void sigPlcSigUpdate();
 
 protected:
     CVM(QObject* p = nullptr);
