@@ -20,6 +20,9 @@ public:
     virtual void start() override;
 
 protected:
+    IActionState* m_sendRunType;
+    quint16 m_runType;
+
     IActionState* m_waitYCGVision;
     IActionState* m_YCGVision;
     IActionState* m_waitYCGAction;
@@ -29,6 +32,4 @@ protected:
     IActionState* m_waitLZAction;
 
     IActionState* m_idle;
-    IActionState* m_sendRunType;
-    quint16 m_runType;
 };

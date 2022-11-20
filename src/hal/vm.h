@@ -2,6 +2,7 @@
 #include "vmDef.h"
 #include <QObject>
 class CModbusMaster;
+class CSerialPort;
 class IAction;
 class CVM:public QObject
 {
@@ -31,5 +32,6 @@ protected:
     CModbusMaster* m_pMaster;
     IAction* m_pResetAction;
     IAction* m_pAutoWorkAction;
+    CSerialPort* m_pSerialPort;
 };
 CVM* vm();

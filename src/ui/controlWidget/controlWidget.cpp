@@ -71,6 +71,7 @@ void ControlWidget::initLayout()
     connect(m_startRun, &QPushButton::clicked, this, [=](){vm()->autoWork(); });
     m_crashStop = new QPushButton(cnStr("停止运行"));
     setAttr(m_crashStop);
+    connect(m_crashStop, &QPushButton::clicked, this, [=](){vm()->stopWork(); });
 
     //汇总
     QGridLayout *pLayoutButton = new QGridLayout();

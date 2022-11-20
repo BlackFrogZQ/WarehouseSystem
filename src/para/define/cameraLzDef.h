@@ -11,7 +11,7 @@ namespace TIGER_CameraLzDef
 		{
 			exposureTime = 35000;
 			heartbeatTime = 5000;
-			ip = "169.254.169.99";
+			ip = "192.168.0.10";
 		};
 	};
 	CCameraParaLz *cameraParasLz();

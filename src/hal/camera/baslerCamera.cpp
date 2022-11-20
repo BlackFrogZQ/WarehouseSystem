@@ -249,6 +249,8 @@ namespace TIGER_BaslerCamera
 
     void CBaslerCamera::slotDisconnected()
     {
+        // TODO 
+        // return;
         m_isConnected = false;
         emit sigAcquireStateChanged();
         if (connected())

@@ -10,35 +10,37 @@ namespace TIGER_ProcessTool
         try
         {
             //********调整曝光及读取ROI
-            HObject roiRegion, imageReduced;
-            HTuple areaRoi, rowRoi, columnRoi;
+            HObject roiRegion;
             ReadRegion(&roiRegion, "ycgRoiRegion.hobj");
-            ReduceDomain(p_image, roiRegion, &imageReduced);
-            AreaCenter(roiRegion, &areaRoi, &rowRoi, &columnRoi);
+            ReduceDomain(p_image, roiRegion, &m_hObject);
 
             //********得到最靠近接近开关的延长杆
-            HObject region, connectedRegions, selectedRegionsCentre, selectedRegions, regionClosing, rgionFillUp, connectedRegionsAll, selectedRegionsNear;
-            HTuple areaAll, rowAll, columnAll, numberAll, i, j;
-            Threshold(imageReduced, &region, 200, 255);
-            Connection(region, &connectedRegions);
+            Threshold(m_hObject, &m_hObject, 210, 255);
+            Connection(m_hObject, &m_hObject);
+
             //得到中间的区域
-            SelectShape(connectedRegions, &selectedRegionsCentre, "column", "and", columnRoi - 20, columnRoi + 20);
+            HTuple areaRoi, rowRoi, columnRoi;
+            AreaCenter(roiRegion, &areaRoi, &rowRoi, &columnRoi);
+            SelectShape(m_hObject, &m_hObject, "column", "and", columnRoi - 30, columnRoi + 30);
+
             //去除多余区域
-            SelectShape(selectedRegionsCentre, &selectedRegions, "area", "and", 10000, 99999999);
-            ClosingCircle(selectedRegions, &regionClosing, 10);
-            FillUp(regionClosing, &rgionFillUp);
-            Connection(rgionFillUp, &connectedRegionsAll);
+            SelectShape(m_hObject, &m_hObject, "area", "and", 1000, 99999999);
+            ClosingCircle(m_hObject, &m_hObject, 10);
+            FillUp(m_hObject, &m_hObject);
+            Connection(m_hObject, &m_hObject);
+
             //获得最近的工件
-            AreaCenter(connectedRegionsAll, &areaAll, &rowAll, &columnAll);
-            CountObj(connectedRegionsAll, &numberAll);
+            HTuple areaAll, rowAll, columnAll, numberAll, i, j;
+            AreaCenter(m_hObject, &areaAll, &rowAll, &columnAll);
+            CountObj(m_hObject, &numberAll);
             {
-                HTuple end_val43 = numberAll - 1;
-                HTuple step_val43 = 1;
-                for (i = 0; i.Continue(end_val43, step_val43); i += step_val43)
+                HTuple endI = numberAll - 1;
+                HTuple stepI = 1;
+                for (i = 0; i.Continue(endI, stepI); i += stepI)
                 {
-                    HTuple end_val47 = (numberAll - i) - 2;
-                    HTuple step_val47 = 1;
-                    for (j = 0; j.Continue(end_val47, step_val47); j += step_val47)
+                    HTuple endJ = (numberAll - i) - 2;
+                    HTuple stepJ = 1;
+                    for (j = 0; j.Continue(endJ, stepJ); j += stepJ)
                     {
                         if (0 != (int(HTuple(rowAll[j]) > HTuple(rowAll[j + 1]))))
                         {
@@ -54,28 +56,62 @@ namespace TIGER_ProcessTool
                     }
                 }
             }
-            SelectShape(connectedRegionsAll, &selectedRegionsNear, "row", "and", HTuple(rowAll[numberAll - 1]), p_imageSize.height());
-            //********判断是否螺纹套螺纹
-            //根据外接矩形的长度判断
-            HTuple rowNear1, columnNear1, rowNear2, columnNear2, length, ratio;
-            HObject rectangle;
-            SmallestRectangle1(selectedRegionsNear, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
-            GenRectangle1(&rectangle, rowNear1, columnNear1, rowNear2, columnNear2);
+            HObject selectedRegionsOriginal;
+            SelectShape(m_hObject, &selectedRegionsOriginal, "row", "and", HTuple(rowAll[numberAll - 1]), p_imageSize.height());
+
+            //对区域进行处理
+            HObject selectedRegionsNear;
+            OpeningCircle(selectedRegionsOriginal, &selectedRegionsNear, 3.5);
+            Connection(selectedRegionsNear, &selectedRegionsNear);
+            AreaCenter(selectedRegionsNear, &areaAll, &rowAll, &columnAll);
+            SelectShape(selectedRegionsNear, &selectedRegionsNear, "area", "and", areaAll.TupleMax(), areaAll.TupleMax());
+
+            FillUp(selectedRegionsNear, &selectedRegionsNear);
+            ShapeTrans(selectedRegionsNear, &selectedRegionsNear, "convex");
 
             //********判断方向
-            HTuple areaMax, rowMax, columnMax;
-            AreaCenter(selectedRegionsNear, &areaMax, &rowMax, &columnMax);
-            //得到小面积区域
-            HObject regionTrans;
-            HTuple areaMin, rowMin, columnMin;
-            GenRectangle1(&rectangle, rowNear2 - 100, columnNear1, rowNear2, columnNear2);
-            ReduceDomain(selectedRegionsNear, rectangle, &imageReduced);
-            ShapeTrans(imageReduced, &regionTrans, "convex");
-            AreaCenter(regionTrans, &areaMin, &rowMin, &columnMin);
-            //得到方向
-            HTuple rectangularity;
-            Rectangularity(regionTrans, &rectangularity);
-            if (0 != (int(rectangularity > 0.93)))
+            //得到小面积区域两端区域的长度比值
+            HTuple rowNear1, columnNear1, rowNear2, columnNear2;
+            SmallestRectangle1(selectedRegionsNear, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
+
+            HObject RectangleBehind, RegionIntersectionBehind;
+            HTuple AreaBehind, RowBehind, ColumnBehind, RowBehind1, ColumnBehind1, RowBehind2, ColumnBehind2, LengthBehind;
+            GenRectangle1(&RectangleBehind, rowNear1, columnNear1, rowNear1 + 10, columnNear2);
+            Intersection(selectedRegionsNear, RectangleBehind, &RegionIntersectionBehind);
+            AreaCenter(RegionIntersectionBehind, &AreaBehind, &RowBehind, &ColumnBehind);
+            SmallestRectangle1(RegionIntersectionBehind, &RowBehind1, &ColumnBehind1, &RowBehind2, &ColumnBehind2);
+            LengthBehind = ColumnBehind2 - ColumnBehind1;
+
+            HObject RectangleFront, RegionIntersectionFront;
+            HTuple AreaFront, RowFront, ColumnFront, RowFront1, ColumnFront1, RowFront2, ColumnFront2, LengthFront;
+            GenRectangle1(&RectangleFront, rowNear2 - 10, columnNear1, rowNear2, columnNear2);
+            Intersection(selectedRegionsNear, RectangleFront, &RegionIntersectionFront);
+            AreaCenter(RegionIntersectionFront, &AreaFront, &RowFront, &ColumnFront);
+            SmallestRectangle1(RegionIntersectionFront, &RowFront1, &ColumnFront1, &RowFront2, &ColumnFront2);
+            LengthFront = ColumnFront2 - ColumnFront1;
+
+            HTuple lengthRadio1, lengthRadio2, lengthRadi;
+            lengthRadio1 = LengthFront / (LengthBehind.TupleReal());
+            lengthRadio2 = LengthBehind / (LengthFront.TupleReal());
+            lengthRadi = lengthRadio1;
+            if (0 != (int(lengthRadio2 < lengthRadio1)))
+            {
+                lengthRadi = lengthRadio2;
+            }
+
+            //对紧挨着的件进行处理
+            if (0 != (int(lengthRadi > 0.8)))
+            {
+                HTuple midDistance;
+                midDistance = (rowNear2 - rowNear1) / 2;
+                GenRectangle1(&m_hObject, (rowNear1 + midDistance) - 5, columnNear1, (rowNear1 + midDistance) + 5, columnNear2);
+                Intersection(selectedRegionsOriginal, m_hObject, &RegionIntersectionBehind);
+                AreaCenter(RegionIntersectionBehind, &AreaBehind, &RowBehind, &ColumnBehind);
+                SmallestRectangle1(RegionIntersectionBehind, &RowBehind1, &ColumnBehind1, &RowBehind2, &ColumnBehind2);
+            }
+
+            //根据前后区域面积判断方向
+            if (0 != (int(AreaFront > AreaBehind)))
             {
                 m_direction = false;
             }

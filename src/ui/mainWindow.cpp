@@ -3,8 +3,6 @@
 #include "hal/camera/baslerCameraLz.h"
 #include "system/tool/halconTool.h"
 #include "system/basic.h"
-#include "imageProcess/createRoi/createRoi.h"
-#include "imageProcess/discernDirection/iDiscernDirection.h"
 #include "imageProcess/imageProcess.h"
 #include <QLabel>
 #include <QHBoxLayout>
@@ -49,10 +47,8 @@ void CMainWindow::initLayout()
 {
     //图像窗口
     m_ycgImageLabel = new QLabel;
-    m_ycgImageLabel->setStyleSheet(cStyleSheet);
     m_ycgImageLabel->setFixedSize(950,722);
     m_lzImageLabel = new QLabel;
-    m_lzImageLabel->setStyleSheet(cStyleSheet);
     m_lzImageLabel->setFixedSize(m_ycgImageLabel->size());
 
     QWidget *widgetAllImage = new QWidget;
@@ -73,7 +69,6 @@ void CMainWindow::initLayout()
 
     QWidget *controlWidget = new QWidget;
     QHBoxLayout *pControlLayout = new QHBoxLayout;
-    m_plcStateLed->setStyleSheet(cStyleSheet);
     pControlLayout->addWidget(m_pOutMsg);
     pControlLayout->addWidget(m_plcStateLed);
     pControlLayout->addWidget(m_controlWidget);
@@ -145,7 +140,6 @@ bool CMainWindow::slotYcgImageDiscern(bool &p_direction)
         return false;
     }
     p_direction = stationMatch.getDirection();
-    myInfo << p_direction;
     return true;
 }
 
@@ -191,6 +185,5 @@ bool CMainWindow::slotLzImageDiscern(bool &p_direction)
         return false;
     }
     p_direction = stationMatch.getDirection();
-    qInfo() << p_direction;
     return true;
 }

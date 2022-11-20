@@ -1,10 +1,14 @@
 ﻿#include "plcStateLed.h"
+#include "ui/mainWindowDef.h"
 #include "hal/communication/plcSigDef.h"
 #include "hal/vm.h"
 #include <QVBoxLayout>
 
 CPlcStateLed::CPlcStateLed(QWidget *parent) : QLabel(parent)
 {
+    this->setObjectName("PlcStateWidget");
+    this->setStyleSheet(QString("#PlcStateWidget{%1};").arg(cStyleSheet ));
+    
     auto getLed = [](QString name)
     {
         auto led = new QLabel(name);
@@ -14,10 +18,11 @@ CPlcStateLed::CPlcStateLed(QWidget *parent) : QLabel(parent)
         led->setAlignment(Qt::AlignCenter);
         return led;
     };
+
     m_states[reset] = getLed(cnStr("  复位  "));
-    m_states[YCGVision] = getLed(cnStr("延长杆\n 到位 "));
+    m_states[YCGVision] = getLed(cnStr("延长杆\n 识别 "));
     m_states[YCGAction] = getLed(cnStr("延长杆\n 装配 "));
-    m_states[LZVision] = getLed(cnStr("螺柱 \n 到位 "));
+    m_states[LZVision] = getLed(cnStr("螺柱 \n 识别 "));
     m_states[LZAction] = getLed(cnStr("螺柱 \n 装配 "));
     m_states[autoRun] = getLed(cnStr("自动运行"));
     initLayout();
@@ -32,6 +37,7 @@ CPlcStateLed::~CPlcStateLed()
 
 void CPlcStateLed::initLayout()
 {
+    QWidget *plcStateWidget = new QWidget;
     QGridLayout *plcStateLayout = new QGridLayout;
     plcStateLayout->addWidget(m_states[reset], 0, 0, 1, 1);
     plcStateLayout->addWidget(m_states[autoRun], 0, 1, 1, 1);
@@ -41,8 +47,31 @@ void CPlcStateLed::initLayout()
     plcStateLayout->addWidget(m_states[LZAction], 2, 1, 1, 1);
     plcStateLayout->setMargin(0);
     plcStateLayout->setSizeConstraint(QGridLayout::SetMinimumSize);
-    this->setMinimumSize(plcStateLayout->sizeHint());
-    this->setLayout(plcStateLayout);
+    plcStateWidget->setLayout(plcStateLayout);
+
+    QWidget *titleWidget = new QWidget;
+    QLabel *titleLable = new QLabel(cnStr("指示信号"));
+    titleLable->setStyleSheet("QLabel{background-color:rgb(255, 255, 255,15)};");
+    QFont titleFont;
+    titleFont.setPointSize(12);
+    titleLable->setFont(titleFont);
+    titleLable->setFixedHeight(20);
+    titleLable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    titleLable->setAlignment(Qt::AlignCenter);
+    QHBoxLayout *pTitleLayout = new QHBoxLayout;
+    pTitleLayout->addWidget(titleLable);
+    pTitleLayout->setMargin(0);
+    pTitleLayout->setSizeConstraint(QHBoxLayout::SetMinimumSize);
+    titleWidget->setLayout(pTitleLayout);
+
+    QVBoxLayout *pLayout = new QVBoxLayout;
+    pLayout->addWidget(titleWidget);
+    pLayout->addWidget(plcStateWidget);
+    pLayout->setMargin(0);
+    pLayout->setSpacing(2);
+    pLayout->setSizeConstraint(QVBoxLayout::SetMinimumSize);
+    this->setMinimumSize(pLayout->sizeHint());
+    this->setLayout(pLayout);
 }
 
 void CPlcStateLed::setAllLed(bool p_enable)

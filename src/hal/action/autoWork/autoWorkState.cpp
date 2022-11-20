@@ -4,6 +4,8 @@
 #include "hal/camera/baslerCamera.h"
 #include "hal/communication/plcSigDef.h"
 #include "hal/vm.h"
+#include "discernDirectionDef.h"
+
 #include <QTimer>
 CAutoWorkIdleState::CAutoWorkIdleState(CAutoWorkAction *p_action) : m_action(p_action)
 {
@@ -39,7 +41,8 @@ void CAutoWorkIdleState::run()
 
 void CWaitYCGVision::run()
 {
-    QTimer::singleShot(10, this, [this]{ runing(); });
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
 }
 void CWaitYCGVision::runing()
 {
@@ -59,12 +62,13 @@ void CWaitYCGVision::runing()
     }
 }
 
-
 void CYCGVision::run()
 {
     assert(masterData()->colis(cpcYCGVision) == true);
     vm()->sendDisColis(cpdcYCGVision, true);
-    QTimer::singleShot(10, this, [this]{ runing(); });
+    vm()->sendHold(cphYCGType, cddUndef);
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
 }
 void CYCGVision::runing()
 {
@@ -73,25 +77,26 @@ void CYCGVision::runing()
         changeState(m_action->m_idle);
         return;
     }
-
-    if (masterData()->colis(cpcYCGVision) == false)
+    if (masterData()->hold(cphYCGType) == cddUndef)
     {
-        myInfo << cnStr("识别延长杆中");
-        CDiscernDirection ycgType = cddPoseError;
-        bool direction;
-        if(mainWindow()->slotYcgImageDiscern(direction))
+        if (masterData()->colis(cpcYCGVision) == false)
         {
-            ycgType = direction ? cddNegativeDirection: cddPositiveDirection;
+            myInfo << cnStr("识别延长杆中");
+            CDiscernDirection ycgType = cddPoseError;
+            bool direction;
+            if (mainWindow()->slotYcgImageDiscern(direction))
+            {
+                ycgType = direction ? cddNegativeDirection : cddPositiveDirection;
+            }
+            myInfo << ycgType;
+            vm()->sendHold(cphYCGType, ycgType);
+            // vm()->sendHold(cphYCGType, dirTest()->getTestType());
+            changeState(m_action->m_waitYCGAction);
         }
-        vm()->sendHold(cphYCGType, ycgType);
-        changeState(m_action->m_waitYCGAction);
     }
-    else
-    {
-        QTimer::singleShot(10, this, [this]{ runing(); });
-    }
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
 }
-
 
 void CWaitYCGAction::run()
 {
@@ -99,7 +104,8 @@ void CWaitYCGAction::run()
     assert(masterData()->disColis(cpdcYCGAction) == false);
     assert(masterData()->disColis(cpdcYCGVision) == true);
     vm()->sendDisColis(cpdcYCGVision, false);
-    QTimer::singleShot(10, this, [this]{ runing(); });
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
 }
 void CWaitYCGAction::runing()
 {
@@ -126,5 +132,6 @@ void CWaitYCGAction::runing()
             }
         }
     }
-    QTimer::singleShot(10, this, [this]{ runing(); });
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
 }

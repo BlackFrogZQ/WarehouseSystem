@@ -34,7 +34,7 @@ public:
     virtual void runing() override;
 };
 
-class CWaitYCGAction:public CAutoWorkIdleState
+class CYCGVision:public CAutoWorkIdleState
 {
     Q_OBJECT
 public:
@@ -43,7 +43,7 @@ public:
     virtual void runing() override;
 };
 
-class CYCGVision:public CAutoWorkIdleState
+class CWaitYCGAction:public CAutoWorkIdleState
 {
     Q_OBJECT
 public:

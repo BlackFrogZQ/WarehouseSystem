@@ -33,7 +33,7 @@ namespace TIGER_BaslerCamera
     SINGLETON_GARBO(CBaslerCameraLz);
     CBaslerCameraLz::CBaslerCameraLz()
         : m_pGigECamera(nullptr),
-          m_ip("169.254.169.99"),
+          m_ip("192.168.0.10"),
           m_exposureTime(30000.0),
           m_heartbeatTimeout(1000)
     {
@@ -248,6 +248,8 @@ namespace TIGER_BaslerCamera
 
     void CBaslerCameraLz::slotDisconnected()
     {
+        //TODO 
+        // return;
         m_isConnected = false;
         emit sigAcquireStateChanged();
         if (connected())

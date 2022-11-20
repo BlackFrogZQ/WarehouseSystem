@@ -4,10 +4,12 @@
 #include "hal/camera/baslerCameraLz.h"
 #include "hal/communication/plcSigDef.h"
 #include "hal/vm.h"
+#include "discernDirectionDef.h"
 #include <QTimer>
 
 void CSendRunType::run()
 {
+    // dirTest()->init(22,22,50);
     assert(masterData()->colis(cpcAuotRun) == false);
     vm()->sendHold(cphRunType, m_action->m_runType);
     QTimer::singleShot(10, this, [this]{ runing(); });
@@ -63,6 +65,7 @@ void CLZVision::run()
 {
     assert(masterData()->colis(cpcLZVision) == true);
     vm()->sendDisColis(cpdcLZVision, true);
+    vm()->sendHold(cphLZType, cddUndef);
     QTimer::singleShot(10, this, [this]{ runing(); });
 }
 void CLZVision::runing()
@@ -73,22 +76,24 @@ void CLZVision::runing()
         return;
     }
 
-    if (masterData()->colis(cpcLZVision) == false)
+    if (masterData()->hold(cphLZType) == cddUndef)
     {
-        myInfo << cnStr("识别螺柱中");
-        CDiscernDirection lzType = cddPoseError;
-        bool direction;
-        if(mainWindow()->slotLzImageDiscern(direction))
+        if (masterData()->colis(cpcLZVision) == false)
         {
-            lzType = direction ? cddNegativeDirection: cddPositiveDirection;
+            myInfo << cnStr("识别螺柱中");
+            CDiscernDirection lzType = cddPoseError;
+            bool direction;
+            if(mainWindow()->slotLzImageDiscern(direction))
+            {
+                lzType = direction ? cddNegativeDirection: cddPositiveDirection;
+            }
+            myInfo << lzType;
+            vm()->sendHold(cphLZType, lzType);
+            // vm()->sendHold(cphLZType, dirTest()->getTestType());
+            changeState(m_action->m_waitLZAction);
         }
-        vm()->sendHold(cphLZType, lzType);
-        changeState(m_action->m_waitLZAction);
     }
-    else
-    {
-        QTimer::singleShot(10, this, [this]{ runing(); });
-    }
+    QTimer::singleShot(10, this, [this]{ runing(); });
 }
 
 
@@ -118,7 +123,7 @@ void CWaitLZAction::runing()
         {
             if (masterData()->colis(cpcStratLZAction))
             {
-                myDebug << cnStr("开始螺柱");
+                myInfo << cnStr("夹取螺柱");
                 vm()->sendDisColis(cpdcLZAction, false);
                 changeState(m_action->m_waitLZVision);
                 return;

@@ -7,16 +7,16 @@ project(BSVisionTest VERSION 0.1.0)
 # 确定保存即可，cmake访问系统变量 $ENV{变量名},如:访问上述变量'QT5.12.5变量' $ENV{QT5.12.5}
 # 添加用户变量后需重启
 # 自动打包需要在setting.json 添加 "cmake.setBuildTypeOnMultiConfig": true,
-SET(CMAKE_PREFIX_PATH $ENV{QT5.12.5})
+SET(CMAKE_PREFIX_PATH $ENV{QT5.14.0})
 include_directories(${PROJECT_SOURCE_DIR})
-include_directories($ENV{QT5.12.5}\\include)
-include_directories($ENV{QT5.12.5}\\include\\QtGui)
-include_directories($ENV{QT5.12.5}\\include\\QtWidgets)
-include_directories($ENV{QT5.12.5}\\include\\QtCore)
-include_directories($ENV{QT5.12.5}\\include\\QtNetwork)
-include_directories($ENV{QT5.12.5}\\include\\QtSerialBus)
-include_directories($ENV{QT5.12.5}\\include\\QtSerialPort)
-include_directories($ENV{QT5.12.5}\\include\\QtConcurrent)
+include_directories($ENV{QT5.14.0}\\include)
+include_directories($ENV{QT5.14.0}\\include\\QtGui)
+include_directories($ENV{QT5.14.0}\\include\\QtWidgets)
+include_directories($ENV{QT5.14.0}\\include\\QtCore)
+include_directories($ENV{QT5.14.0}\\include\\QtNetwork)
+include_directories($ENV{QT5.14.0}\\include\\QtSerialBus)
+include_directories($ENV{QT5.14.0}\\include\\QtSerialPort)
+include_directories($ENV{QT5.14.0}\\include\\QtConcurrent)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -94,7 +94,7 @@ if(DEFINED CMAKE_BUILD_TYPE)
     message("运行qt打包程序...")
     execute_process(
         COMMAND windeployqt ${exeDir}\\${PROJECT_NAME}.exe
-        WORKING_DIRECTORY $ENV{QT5.12.5}\\bin
+        WORKING_DIRECTORY $ENV{QT5.14.0}\\bin
     )
     message("qt打包结束")
 else()
