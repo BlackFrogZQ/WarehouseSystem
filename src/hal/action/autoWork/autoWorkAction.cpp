@@ -1,9 +1,9 @@
 ﻿#include "autoWorkAction.h"
 #include "autoWorkState.h"
-
+#include "ui/controlWidget/controlWidget.h"
 #include "hal/vm.h"
 
-CAutoWorkAction::CAutoWorkAction(CVM *p_vm):IAction(p_vm),m_runType(0xffff)
+CAutoWorkAction::CAutoWorkAction(CVM *p_vm): IAction(p_vm), m_runType(0xffff)
 {
     m_sendRunType = new CSendRunType(this);
 
@@ -32,7 +32,12 @@ CAutoWorkAction::~CAutoWorkAction()
 void CAutoWorkAction::start()
 {
     IAction::start();
-    // TODO 启动类型
-    m_runType = 7;
+    m_runType = controlPara()->runType();
+    m_twist = controlPara()->twist();
     m_sendRunType->run();
+}
+
+void CAutoWorkAction::stop()
+{
+    IAction::stop();
 }

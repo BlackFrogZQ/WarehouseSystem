@@ -1,10 +1,4 @@
 ﻿#include "serialPort.h"
-#include "ui/controlWidget/controlWidget.h"
-#include "typeDef.h"
-#include <QStringList>
-#include <QMessageBox>
-#include <QTimer>
-#include <QThread>
 
 CSerialPort::CSerialPort(QObject *p): QObject(p)
 {
@@ -50,5 +44,6 @@ void CSerialPort::slotReceiveInfo()
     {
         emit sendReadSignal(readData);
         myInfo<<readData;
+        readData.clear();
     }
 }

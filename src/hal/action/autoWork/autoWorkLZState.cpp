@@ -9,9 +9,10 @@
 
 void CSendRunType::run()
 {
-    // dirTest()->init(22,22,50);
+    // dirTest()->init(17,17,50);
     assert(masterData()->colis(cpcAuotRun) == false);
     vm()->sendHold(cphRunType, m_action->m_runType);
+    vm()->sendHold(cphTwist, m_action->m_twist);
     QTimer::singleShot(10, this, [this]{ runing(); });
 }
 void CSendRunType::runing()
@@ -91,6 +92,7 @@ void CLZVision::runing()
             vm()->sendHold(cphLZType, lzType);
             // vm()->sendHold(cphLZType, dirTest()->getTestType());
             changeState(m_action->m_waitLZAction);
+            return;
         }
     }
     QTimer::singleShot(10, this, [this]{ runing(); });

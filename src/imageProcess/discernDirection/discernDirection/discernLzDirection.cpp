@@ -57,7 +57,7 @@ namespace TIGER_ProcessTool
 
             //对区域进行处理
             HObject selectedRegionsNear;
-            OpeningCircle(selectedRegionsOriginal, &selectedRegionsNear, 3.5);
+            OpeningCircle(selectedRegionsOriginal, &selectedRegionsNear, 2);
             Connection(selectedRegionsNear, &selectedRegionsNear);
             AreaCenter(selectedRegionsNear, &areaAll, &rowAll, &columnAll);
             SelectShape(selectedRegionsNear, &selectedRegionsNear, "area", "and", areaAll.TupleMax(), areaAll.TupleMax());
@@ -147,7 +147,7 @@ namespace TIGER_ProcessTool
             }
 
             //根据长度比值判断方向
-            if (0 != (int(lengthRadi > 0.85)))
+            if (0 != (int(lengthRadi > 0.9)))
             {
                 m_direction = false;
             }

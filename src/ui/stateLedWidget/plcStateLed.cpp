@@ -37,6 +37,7 @@ CPlcStateLed::~CPlcStateLed()
 
 void CPlcStateLed::initLayout()
 {
+    //信号
     QWidget *plcStateWidget = new QWidget;
     QGridLayout *plcStateLayout = new QGridLayout;
     plcStateLayout->addWidget(m_states[reset], 0, 0, 1, 1);
@@ -46,9 +47,11 @@ void CPlcStateLed::initLayout()
     plcStateLayout->addWidget(m_states[LZVision], 2, 0, 1, 1);
     plcStateLayout->addWidget(m_states[LZAction], 2, 1, 1, 1);
     plcStateLayout->setMargin(0);
+    plcStateLayout->setVerticalSpacing(30);
     plcStateLayout->setSizeConstraint(QGridLayout::SetMinimumSize);
     plcStateWidget->setLayout(plcStateLayout);
 
+    //标题
     QWidget *titleWidget = new QWidget;
     QLabel *titleLable = new QLabel(cnStr("指示信号"));
     titleLable->setStyleSheet("QLabel{background-color:rgb(255, 255, 255,15)};");
@@ -58,17 +61,19 @@ void CPlcStateLed::initLayout()
     titleLable->setFixedHeight(20);
     titleLable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     titleLable->setAlignment(Qt::AlignCenter);
+
     QHBoxLayout *pTitleLayout = new QHBoxLayout;
     pTitleLayout->addWidget(titleLable);
     pTitleLayout->setMargin(0);
     pTitleLayout->setSizeConstraint(QHBoxLayout::SetMinimumSize);
     titleWidget->setLayout(pTitleLayout);
 
+    //汇总
     QVBoxLayout *pLayout = new QVBoxLayout;
     pLayout->addWidget(titleWidget);
     pLayout->addWidget(plcStateWidget);
     pLayout->setMargin(0);
-    pLayout->setSpacing(2);
+    pLayout->setSpacing(0);
     pLayout->setSizeConstraint(QVBoxLayout::SetMinimumSize);
     this->setMinimumSize(pLayout->sizeHint());
     this->setLayout(pLayout);

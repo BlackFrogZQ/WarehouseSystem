@@ -1,22 +1,18 @@
 ﻿#include "controlWidget.h"
 #include "ui/mainWindow.h"
-#include "ui/inputDialog/inputDialog.h"
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
 #include "hal/vm.h"
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QTimer>
-#include <QHeaderView>
-#include <QKeyEvent>
-using namespace HalconCpp;
+#include <QGridLayout>
+#include <QDoubleSpinBox>
 
-ControlWidget::ControlWidget():QLabel(nullptr)
+ControlWidget::ControlWidget(): QLabel(nullptr)
 {
     this->setObjectName("ControlWidget");
     this->setStyleSheet(QString("#ControlWidget{%1};").arg(cStyleSheet ));
     initLayout();
     connect(vm(), &CVM::sigVMStateUpdate, this, &ControlWidget::vmStateUpdate);
+    connect(vm(), &CVM::sigRunType, this, &ControlWidget::setRunTtpe);
     vmStateUpdate();
 }
 
@@ -55,12 +51,9 @@ void ControlWidget::initLayout()
     QLabel *pLabelLzType = new QLabel;
     pLabelLzType = getLed(cnStr("螺柱型号："));
     m_lzType = getLineEdit();
-    QLabel *pTypeMate = new QLabel;
-    pTypeMate = getLed(cnStr("类型匹配成功"));
-    pTypeMate->setStyleSheet("border:1px groove gray;\nborder-radius:5px;QLabel{background-color:rgb(0,255,0)}QLabel:disabled{background:transparent};");
-    pTypeMate->setEnabled(false);
-    pTypeMate->setFixedHeight(160);
-    pTypeMate->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_typeMate = getLed(cnStr("类型匹配"));
+    m_typeMate->setFixedHeight(100);
+    m_typeMate->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //PLC控制
     m_reset = new QPushButton(cnStr("复位"));
@@ -73,6 +66,22 @@ void ControlWidget::initLayout()
     setAttr(m_crashStop);
     connect(m_crashStop, &QPushButton::clicked, this, [=](){vm()->stopWork(); });
 
+    //扭矩
+    QLabel *pLabelTwist = new QLabel;
+    pLabelTwist = getLed(cnStr("设置扭矩值："));
+    QDoubleSpinBox* twist = new QDoubleSpinBox(this);
+    twist->setMinimum(0.5);
+    twist->setMaximum(5);
+    twist->setSingleStep(0.5);
+    twist->setValue(2);
+    twist->setDecimals(1);
+    twist->setSuffix(" Nm");
+    setAttr(twist);
+    twist->setAlignment(Qt::AlignCenter);
+    twist->setStyleSheet(cStyleSheet);
+    twist->setFocusPolicy(Qt::NoFocus);
+    connect(twist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ControlWidget::setTwistPara);
+
     //汇总
     QGridLayout *pLayoutButton = new QGridLayout();
     pLayoutButton->addWidget(m_reset, 0, 0, 1, 1);
@@ -82,7 +91,9 @@ void ControlWidget::initLayout()
     pLayoutButton->addWidget(m_ycgType, 1, 1, 1, 1);
     pLayoutButton->addWidget(pLabelLzType, 2, 0, 1, 1);
     pLayoutButton->addWidget(m_lzType, 2, 1, 1, 1);
-    pLayoutButton->addWidget(pTypeMate, 1, 2, 2, 1);
+    pLayoutButton->addWidget(m_typeMate, 1, 2, 2, 1);
+    pLayoutButton->addWidget(pLabelTwist, 3, 0, 1, 1);
+    pLayoutButton->addWidget(twist, 3, 1, 1, 1);
     pLayoutButton->setMargin(0);
     pLayoutButton->setSizeConstraint(QGridLayout::SetMinimumSize);
     this->setMinimumSize(pLayoutButton->sizeHint());
@@ -95,8 +106,8 @@ void ControlWidget::vmStateUpdate()
     {
     case vmIdle:
         m_reset->setEnabled(true);
-        m_startRun->setEnabled(true);
         m_crashStop->setEnabled(true);
+        m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
         break;
     case vmReset:
         m_reset->setEnabled(false);
@@ -114,4 +125,62 @@ void ControlWidget::vmStateUpdate()
         m_crashStop->setEnabled(false);
         break;
     }
+}
+
+void ControlWidget::setRunTtpe(QByteArray p_runType)
+{
+    if(vm()->vmState() != vmIdle)
+    {
+        return;
+    }
+
+    if(p_runType.left(2).toInt() > typeTotalCount)
+    {
+        m_lzType->clear();
+        m_lzType->setText(cLzTypeName[p_runType.toInt() - typeTotalCount - 1]);
+    }
+    else
+    {
+        m_ycgType->clear();
+        m_ycgType->setText(cYcgTypeName[p_runType.toInt() - 1]);
+    }
+
+    if(!(m_lzType->text().isEmpty() || m_ycgType->text().isEmpty()))
+    {
+        if(cYcgTypeName.indexOf(m_ycgType->text()) == cLzTypeName.indexOf(m_lzType->text()) )
+        {
+            m_startRun->setEnabled(true);
+            m_typeMate->setText(cnStr("类型匹配成功"));
+            m_typeMate->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
+            controlPara()->m_runType = cYcgTypeName.indexOf(m_ycgType->text()) + 1;
+        }
+        else
+        {
+            m_startRun->setEnabled(false);
+            m_typeMate->setText(cnStr("类型匹配失败"));
+            m_typeMate->setStyleSheet("QLabel{background-color:rgb(255,0,0)}");
+        }
+    }
+}
+
+void ControlWidget::setTwistPara(double p_twistPara)
+{
+    controlPara()->m_twist = p_twistPara * 10;
+}
+
+
+CControlPara* controlPara()
+{
+    static CControlPara gPortState;
+    return &gPortState;
+}
+
+quint16 CControlPara::runType() const
+{
+    return m_runType;
+}
+
+quint16 CControlPara::twist() const
+{
+    return m_twist;
 }

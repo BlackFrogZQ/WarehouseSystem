@@ -42,13 +42,14 @@ CVM::CVM(QObject *p)
     myInfo << (successful ? cnStr("服务器创建成功") : cnStr("服务器创建失败"));
     if (successful)
     {
-        // reset();
+        reset();
     }
 
-    const auto portName = "COM3";
+    const auto portName = "COM5";
     m_pSerialPort = new CSerialPort(this);
     m_pSerialPort->setPort(portName);
     myInfo << (m_pSerialPort->slotOpenPort() ? cnStr("扫描仪连接成功") : cnStr("扫描仪连接失败"));
+    connect(m_pSerialPort,&CSerialPort::sendReadSignal,this,&CVM::setRunType);
 }
 
 CVM::~CVM()
@@ -87,14 +88,12 @@ void CVM::autoWork()
 {
     changeState(vmAutoWork);
     m_pAutoWorkAction->start();
-    m_pSerialPort->slotOpenPort();
 }
 
 void CVM::stopWork()
 {
     assert(m_state == vmAutoWork);
     m_pAutoWorkAction->stop();
-    m_pSerialPort->slotOpenPort();
 }
 
 void CVM::changeState(CVMState nextState)
@@ -102,4 +101,9 @@ void CVM::changeState(CVMState nextState)
     m_state = nextState;
     myDebug << cnStr("当前vm状态：") << nextState;
     emit sigVMStateUpdate();
+}
+
+void CVM::setRunType(QByteArray p_readType)
+{
+    emit sigRunType(p_readType);
 }

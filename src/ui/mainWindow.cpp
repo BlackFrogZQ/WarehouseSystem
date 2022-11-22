@@ -35,6 +35,7 @@ CMainWindow::~CMainWindow()
 {
     delPtr(m_pOutMsg);
     delPtr(m_controlWidget);
+    delPtr(m_plcStateLed);
 }
 
 void CMainWindow::printMsg(QString p_msg)

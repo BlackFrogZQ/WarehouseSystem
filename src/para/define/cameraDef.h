@@ -11,7 +11,7 @@ namespace TIGER_CameraDef
 		{
 			exposureTime = 35000;
 			heartbeatTime = 5000;
-			ip = "192.168.0.7";
+			ip = "169.254.169.99";
 		};
 	};
 	CCameraPara *cameraParas();

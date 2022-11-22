@@ -18,10 +18,12 @@ public:
     ~CAutoWorkAction();
 
     virtual void start() override;
+    virtual void stop() override;
 
 protected:
     IActionState* m_sendRunType;
     quint16 m_runType;
+    quint16 m_twist;
 
     IActionState* m_waitYCGVision;
     IActionState* m_YCGVision;

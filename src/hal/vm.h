@@ -1,5 +1,6 @@
 #pragma once
 #include "vmDef.h"
+#include "communication/serialPort/typeDef.h"
 #include <QObject>
 class CModbusMaster;
 class CSerialPort;
@@ -11,6 +12,7 @@ class CVM:public QObject
 public:
     bool sendDisColis(int p_addr,bool p_value);
     bool sendHold(int p_addr,quint16 p_value);
+
     void reset();
     void stoReset();
     void autoWork();
@@ -21,17 +23,20 @@ public:
 signals:
     void sigVMStateUpdate();
     void sigPlcSigUpdate();
+    void sigRunType(QByteArray p_runType);
 
 protected:
     CVM(QObject* p = nullptr);
     ~CVM();
     void changeState(CVMState nextState);
+    void setRunType(QByteArray p_readType);
 
 protected:
-    CVMState m_state;
     CModbusMaster* m_pMaster;
     IAction* m_pResetAction;
     IAction* m_pAutoWorkAction;
+    CVMState m_state;
+
     CSerialPort* m_pSerialPort;
 };
 CVM* vm();

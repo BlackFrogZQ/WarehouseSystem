@@ -34,7 +34,7 @@ namespace TIGER_BaslerCamera
     SINGLETON_GARBO(CBaslerCamera);
     CBaslerCamera::CBaslerCamera()
         : m_pGigECamera(nullptr),
-          m_ip("192.168.0.7"),
+          m_ip("169.254.169.99"),
           m_exposureTime(30000.0),
           m_heartbeatTimeout(1000)
     {

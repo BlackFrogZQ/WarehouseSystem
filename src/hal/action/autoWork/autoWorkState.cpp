@@ -5,8 +5,8 @@
 #include "hal/communication/plcSigDef.h"
 #include "hal/vm.h"
 #include "discernDirectionDef.h"
-
 #include <QTimer>
+
 CAutoWorkIdleState::CAutoWorkIdleState(CAutoWorkAction *p_action) : m_action(p_action)
 {
     assert(m_action != nullptr);
@@ -92,6 +92,7 @@ void CYCGVision::runing()
             vm()->sendHold(cphYCGType, ycgType);
             // vm()->sendHold(cphYCGType, dirTest()->getTestType());
             changeState(m_action->m_waitYCGAction);
+            return;
         }
     }
     QTimer::singleShot(10, this, [this]

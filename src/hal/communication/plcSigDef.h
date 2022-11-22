@@ -35,7 +35,7 @@ enum CPcHold : unsigned char
     cphRunType = 0,
     cphYCGType,
     cphLZType,
-    cphTemp,
+    cphTwist,
     cphTemp1,
     cphTemp2,
     cphTemp3,

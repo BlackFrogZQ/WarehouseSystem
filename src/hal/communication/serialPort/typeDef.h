@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "system/basic.h"
 
+const int typeTotalCount = 30;
+
 enum CYcgType : unsigned char
 {
     cytM678 = 1,
