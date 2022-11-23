@@ -1,8 +1,13 @@
+add_subdirectory(inputDialog)
+add_subdirectory(controlWidget)
+add_subdirectory(stateLedWidget)
+add_subdirectory(setParaWindow)
+
 aux_source_directory(. DIR_SYSTEM_SRCS)
-set(cppFile
-    inputDialog/inputDialog.cpp
-    controlWidget/controlWidget.cpp
-    stateLedWidget/plcStateLed.cpp)
-add_library(uiLib
-    ${DIR_SYSTEM_SRCS}
-    ${cppFile})
+add_library(uiLib ${DIR_SYSTEM_SRCS})
+
+target_link_libraries(uiLib
+    inputDialogLib
+    controlWidgetLib
+    stateLedWidgetLib
+    setParaWindowLib)

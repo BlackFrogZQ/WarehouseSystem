@@ -32,9 +32,7 @@ namespace TIGER_Para
         m_xmlFilePath = QDir::currentPath() + cnStr("//xmlDataFileAll.xml");
     };
 
-    CParaService::~CParaService()
-    {
-    };
+    CParaService::~CParaService(){};
 
     void CParaService::save()
     {

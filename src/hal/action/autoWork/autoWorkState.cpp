@@ -88,7 +88,6 @@ void CYCGVision::runing()
             {
                 ycgType = direction ? cddNegativeDirection : cddPositiveDirection;
             }
-            myInfo << ycgType;
             vm()->sendHold(cphYCGType, ycgType);
             // vm()->sendHold(cphYCGType, dirTest()->getTestType());
             changeState(m_action->m_waitYCGAction);

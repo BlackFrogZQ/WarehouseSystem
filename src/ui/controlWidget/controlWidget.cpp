@@ -3,8 +3,12 @@
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
 #include "hal/vm.h"
+#include "system/systemService.h"
+#include "ui/setParaWindow/setParaWindow.h"
+#include "para/define/paraDef.h"
 #include <QGridLayout>
 #include <QDoubleSpinBox>
+#include <QMessageBox>
 
 ControlWidget::ControlWidget(): QLabel(nullptr)
 {
@@ -52,7 +56,7 @@ void ControlWidget::initLayout()
     pLabelLzType = getLed(cnStr("螺柱型号："));
     m_lzType = getLineEdit();
     m_typeMate = getLed(cnStr("类型匹配"));
-    m_typeMate->setFixedHeight(100);
+    m_typeMate->setFixedHeight(140);
     m_typeMate->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //PLC控制
@@ -82,18 +86,32 @@ void ControlWidget::initLayout()
     twist->setFocusPolicy(Qt::NoFocus);
     connect(twist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ControlWidget::setTwistPara);
 
+    //系统参数设置
+    m_systemPara = new QPushButton(cnStr("系统参数设置"));
+    setAttr(m_systemPara);
+    connect(m_systemPara, &QPushButton::clicked, this, [=](){
+        CSetParaWindow setParaWindow;
+        setParaWindow.setShowNode(TIGER_ParaDef::paraRootNode());
+        setParaWindow.exec();
+        if (QMessageBox::Yes ==
+        QMessageBox::question(this, cnStr("保存参数"), cnStr("是否重启系统保存参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
+        {
+            sys()->restartSys();
+        }});
+
     //汇总
     QGridLayout *pLayoutButton = new QGridLayout();
     pLayoutButton->addWidget(m_reset, 0, 0, 1, 1);
     pLayoutButton->addWidget(m_startRun, 0, 1, 1, 1);
     pLayoutButton->addWidget(m_crashStop, 0, 2, 1, 1);
-    pLayoutButton->addWidget(pLabelYcgType, 1, 0, 1, 1);
-    pLayoutButton->addWidget(m_ycgType, 1, 1, 1, 1);
-    pLayoutButton->addWidget(pLabelLzType, 2, 0, 1, 1);
-    pLayoutButton->addWidget(m_lzType, 2, 1, 1, 1);
-    pLayoutButton->addWidget(m_typeMate, 1, 2, 2, 1);
-    pLayoutButton->addWidget(pLabelTwist, 3, 0, 1, 1);
-    pLayoutButton->addWidget(twist, 3, 1, 1, 1);
+    pLayoutButton->addWidget(pLabelTwist, 1, 0, 1, 1);
+    pLayoutButton->addWidget(twist, 1, 1, 1, 1);
+    pLayoutButton->addWidget(m_systemPara, 1, 2, 1, 1);
+    pLayoutButton->addWidget(pLabelYcgType, 2, 0, 1, 1);
+    pLayoutButton->addWidget(m_ycgType, 2, 1, 1, 1);
+    pLayoutButton->addWidget(pLabelLzType, 3, 0, 1, 1);
+    pLayoutButton->addWidget(m_lzType, 3, 1, 1, 1);
+    pLayoutButton->addWidget(m_typeMate, 2, 2, 2, 1);
     pLayoutButton->setMargin(0);
     pLayoutButton->setSizeConstraint(QGridLayout::SetMinimumSize);
     this->setMinimumSize(pLayoutButton->sizeHint());
@@ -108,21 +126,25 @@ void ControlWidget::vmStateUpdate()
         m_reset->setEnabled(true);
         m_crashStop->setEnabled(true);
         m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
+        // m_systemPara->setEnabled(true);
         break;
     case vmReset:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(true);
+        // m_systemPara->setEnabled(false);
         break;
     case vmAutoWork:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(true);
+        // m_systemPara->setEnabled(false);
         break;
     default:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
+        // m_systemPara->setEnabled(false);
         break;
     }
 }

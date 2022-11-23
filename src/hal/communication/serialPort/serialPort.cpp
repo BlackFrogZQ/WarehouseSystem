@@ -43,7 +43,6 @@ void CSerialPort::slotReceiveInfo()
     if(!readData.isNull())
     {
         emit sendReadSignal(readData);
-        myInfo<<readData;
         readData.clear();
     }
 }

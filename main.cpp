@@ -9,6 +9,7 @@ void closeSystemService();
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":res/assemble.png"));
     if(QMessageBox::information(NULL, cnStr("请检查"), cnStr("气泵是否打开？"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
         initSystemService();

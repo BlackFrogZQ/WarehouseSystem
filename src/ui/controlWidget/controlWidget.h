@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ui/mainWindowDef.h"
 #include "ui/basic.h"
 #include "system/basic.h"
@@ -26,6 +26,7 @@ protected:
     QPushButton *m_reset;
     QPushButton *m_startRun;
     QPushButton *m_crashStop;
+    QPushButton *m_systemPara;
 
     QLineEdit *m_ycgType;
     QLineEdit *m_lzType;

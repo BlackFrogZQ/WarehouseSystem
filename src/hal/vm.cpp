@@ -2,6 +2,8 @@
 #include "communication/modbusMaster.h"
 #include "communication/serialPort/serialPort.h"
 #include "action/iAction.h"
+#include "para/define/scannerDef.h"
+#include "para/define/pcDef.h"
 
 static CVM *g_Vm = nullptr;
 CVM *vm()
@@ -34,9 +36,9 @@ CVM::CVM(QObject *p)
 
     m_pMaster = new CModbusMaster(this);
     connect(m_pMaster,&CModbusMaster::sigDataUpdate,this,&CVM::sigPlcSigUpdate);
-    const auto cIP = "192.168.0.32";
-    const auto cPort = 502;
-    const auto cAddr = 255;
+    const auto cIP = TIGER_PCDef::pcParas()->serverIp;
+    const auto cPort = TIGER_PCDef::pcParas()->serverPort;
+    const auto cAddr = TIGER_PCDef::pcParas()->serverAddr;
     myInfo << cnStr("服务器地址:ip:%1,port:%2,设备号:%3").arg(cIP).arg(cPort).arg(cAddr);
     bool successful = m_pMaster->listen(cIP, cPort, cAddr);
     myInfo << (successful ? cnStr("服务器创建成功") : cnStr("服务器创建失败"));
@@ -45,7 +47,7 @@ CVM::CVM(QObject *p)
         reset();
     }
 
-    const auto portName = "COM5";
+    const auto portName = TIGER_ScannerDef::scannerParas()->scannerPort;
     m_pSerialPort = new CSerialPort(this);
     m_pSerialPort->setPort(portName);
     myInfo << (m_pSerialPort->slotOpenPort() ? cnStr("扫描仪连接成功") : cnStr("扫描仪连接失败"));

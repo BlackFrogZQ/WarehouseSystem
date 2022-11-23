@@ -88,7 +88,6 @@ void CLZVision::runing()
             {
                 lzType = direction ? cddNegativeDirection: cddPositiveDirection;
             }
-            myInfo << lzType;
             vm()->sendHold(cphLZType, lzType);
             // vm()->sendHold(cphLZType, dirTest()->getTestType());
             changeState(m_action->m_waitLZAction);

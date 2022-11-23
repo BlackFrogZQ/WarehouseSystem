@@ -4,6 +4,7 @@
 #include "para/para.h"
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
+#include "hal/vm.h"
 #include "para/define/cameraDef.h"
 #include "para/define/cameraLzDef.h"
 #include "ui/mainWindow.h"
@@ -11,7 +12,6 @@
 #include <QDateTime>
 #include <QProcess>
 #include <QApplication>
-#include "hal/vm.h"
 
 void logOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
@@ -35,6 +35,8 @@ protected:
     QStringList m_msgBuffer;
     CVM* m_pVm;
 };
+
+
 
 CVmControl::CVmControl()
     : ISystemService()
@@ -92,6 +94,7 @@ void CVmControl::restartSys() const
     QProcess::startDetached(qApp->applicationFilePath(), QStringList());
 }
 
+
 void CVmControl::load()
 {
     paraService()->load();
@@ -103,6 +106,12 @@ void CVmControl::save()
 }
 
 ISystemService *g_sysService = nullptr;
+ISystemService *sys()
+{
+    return g_sysService;
+};
+
+
 
 void initSystemService()
 {
@@ -116,26 +125,24 @@ void initSystemService()
     }
 
     CUiBasic::updateScale(1920, 1080);
+
     g_sysService = new CVmControl;
     qInstallMessageHandler(logOutput);
     sys()->load();
     ((CVmControl *)g_sysService)->init();
+
     baslerCamera()->setIP(TIGER_CameraDef::cameraParas()->ip);
     baslerCamera()->setExposureTime(TIGER_CameraDef::cameraParas()->exposureTime);
+    baslerCamera()->setHeartbeatTimeout(TIGER_CameraDef::cameraParas()->heartbeatTime);
     baslerCameraLz()->setIP(TIGER_CameraLzDef::cameraParasLz()->ip);
     baslerCameraLz()->setExposureTime(TIGER_CameraLzDef::cameraParasLz()->exposureTime);
+    baslerCameraLz()->setHeartbeatTimeout(TIGER_CameraLzDef::cameraParasLz()->heartbeatTime);
 }
 
 void closeSystemService()
 {
-    TIGER_CameraDef::cameraParas()->exposureTime = baslerCamera()->getExposureTime();
-    TIGER_CameraLzDef::cameraParasLz()->exposureTime = baslerCameraLz()->getExposureTime();
     sys()->save();
+
     delete g_sysService;
     g_sysService = nullptr;
 }
-
-ISystemService *sys()
-{
-    return g_sysService;
-};

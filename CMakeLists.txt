@@ -33,7 +33,8 @@ else()
 endif()
 
 execute_process(
-    COMMAND chcp 65001)
+    COMMAND chcp 65001
+)
 
 set(Qt5model
     Qt5::Widgets
@@ -53,21 +54,41 @@ endif()
 
 include_directories(include/halcon12x64 include/halcon12x64/halconcpp)
 include_directories(${PROJECT_SOURCE_DIR}/src)
-file(GLOB libs "lib/halcon12x64/*.lib")
-
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/system)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/ui)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/hal)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/imageProcess)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/para)
 set(paraServerCpp
     src/para/define/paraDef.cpp
+    src/para/define/pcDef.cpp
+    src/para/define/cameraDef.cpp
     src/para/define/cameraLzDef.cpp
-    src/para/define/cameraDef.cpp)
+    src/para/define/scannerDef.cpp)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/ui)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/hal)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/imageProcess)
 
-set(srcCpp
-    src/ui/mainWindow.cpp)
+file(GLOB libs "lib/halcon12x64/*.lib")
+
+# set(srcCpp
+#     src/ui/mainWindow.cpp)
+
+# set(sources
+#     ${paraServerCpp}
+#     main.cpp
+# )
+
+qt5_add_resources(sources qml.qrc)
+
+# if(${isRelease})
+#     add_executable(${PROJECT_NAME}
+#         WIN32
+#         ${sources}
+#         assemble.rc)
+# else()
+#     add_executable(${PROJECT_NAME}
+#         ${sources}
+#         assemble.rc)
+# endif()
 
 # Specify MSVC UTF-8 encoding
 # add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
@@ -76,8 +97,16 @@ set(srcCpp
 add_executable(${PROJECT_NAME}
     # WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
     ${paraServerCpp}
-    main.cpp)
+    ${sources}
+    main.cpp
+    ico.rc)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort halLib sysLib halconProcessLib paraLib uiLib) # Qt5 Shared Library
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
+
 
 if(DEFINED CMAKE_BUILD_TYPE)
     set(exeDir ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})

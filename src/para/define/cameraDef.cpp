@@ -18,7 +18,7 @@ namespace TIGER_CameraDef
         CCameraDefParas() : CParas(cnStr("cameraPara"), cnStr("延长杆相机参数"), true)
         {
             m_currentNode->appendNode({pntString, "ip", cnStr("ip"), true}, &(cameraParas()->ip));
-            m_currentNode->appendNode({pntInt, "exposureTime", cnStr("初始曝光时间"), false}, &(cameraParas()->exposureTime));
+            m_currentNode->appendNode({pntInt, "exposureTime", cnStr("初始曝光时间"), true}, &(cameraParas()->exposureTime));
             m_currentNode->appendNode({pntInt, "heartbeatTime", cnStr("心跳时间"), true}, &(cameraParas()->heartbeatTime));
         };
     };
