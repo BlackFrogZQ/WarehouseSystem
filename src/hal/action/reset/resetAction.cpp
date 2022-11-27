@@ -19,5 +19,6 @@ CResetAction::~CResetAction()
 void CResetAction::start()
 {
     IAction::start();
+    autoRun()->isAutoRun = false;
     m_waitResponse->run();
 }

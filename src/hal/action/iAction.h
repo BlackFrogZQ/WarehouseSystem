@@ -28,3 +28,14 @@ public:
 protected:
     CVM *m_pVM;
 };
+
+
+struct CAutoRun
+{
+public:
+    bool getAutoRun() const;
+public:
+    bool isAutoRun = false;
+};
+
+CAutoRun *autoRun();

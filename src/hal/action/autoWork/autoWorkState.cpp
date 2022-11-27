@@ -51,6 +51,11 @@ void CWaitYCGVision::runing()
         changeState(m_action->m_idle);
         return;
     }
+    if(masterData()->colis(cpcAutoStop))
+    {
+        changeState(m_action->m_autoStop);
+        return;
+    }
 
     if (masterData()->colis(cpcYCGVision))
     {
@@ -131,6 +136,34 @@ void CWaitYCGAction::runing()
                 return;
             }
         }
+    }
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
+}
+
+
+void CAutoStop::run()
+{
+    assert(masterData()->colis(cpcAutoStop) == true);
+    QTimer::singleShot(10, this, [this]
+                       { runing(); });
+}
+void CAutoStop::runing()
+{
+    if (m_action->m_bStop)
+    {
+        changeState(m_action->m_idle);
+        return;
+    }
+
+    if (masterData()->colis(cpcAutoStop))
+    {
+        vm()->sendDisColis(cpdcAutoStop, true);
+    }
+    else
+    {
+        changeState(m_action->m_idle);
+        return;
     }
     QTimer::singleShot(10, this, [this]
                        { runing(); });

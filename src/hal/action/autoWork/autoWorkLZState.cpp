@@ -24,12 +24,13 @@ void CSendRunType::runing()
     }
     if (masterData()->hold(cphRunType) == m_action->m_runType)
     {
-        if (masterData()->colis(cpcAuotRun) == false)
+        if ((masterData()->colis(cpcAuotRun) == false) && (autoRun()->getAutoRun() == false))
         {
             vm()->sendDisColis(cpdcAuotRun,true);
         }
         else
         {
+            autoRun()->isAutoRun = true;
             vm()->sendDisColis(cpdcAuotRun,false);
             changeState(m_action->m_waitYCGVision);
             return;

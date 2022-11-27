@@ -68,14 +68,16 @@ void ControlWidget::initLayout()
     connect(m_startRun, &QPushButton::clicked, this, [=](){vm()->autoWork(); });
     m_crashStop = new QPushButton(cnStr("停止运行"));
     setAttr(m_crashStop);
-    connect(m_crashStop, &QPushButton::clicked, this, [=](){vm()->stopWork(); });
+    connect(m_crashStop, &QPushButton::clicked, this, [=](){
+        if(vm()->vmState() == vmIdle){return;}
+        vm()->stopWork();});
 
     //扭矩
     QLabel *pLabelTwist = new QLabel;
     pLabelTwist = getLed(cnStr("设置扭矩值："));
     QDoubleSpinBox* twist = new QDoubleSpinBox(this);
     twist->setMinimum(0.5);
-    twist->setMaximum(5);
+    twist->setMaximum(30);
     twist->setSingleStep(0.5);
     twist->setValue(2);
     twist->setDecimals(1);
@@ -131,7 +133,7 @@ void ControlWidget::vmStateUpdate()
     case vmReset:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(true);
+        m_crashStop->setEnabled(false);
         // m_systemPara->setEnabled(false);
         break;
     case vmAutoWork:
@@ -151,7 +153,7 @@ void ControlWidget::vmStateUpdate()
 
 void ControlWidget::setRunTtpe(QByteArray p_runType)
 {
-    if(vm()->vmState() != vmIdle)
+    if(vm()->vmState() == vmAutoWork)
     {
         return;
     }
@@ -171,7 +173,7 @@ void ControlWidget::setRunTtpe(QByteArray p_runType)
     {
         if(cYcgTypeName.indexOf(m_ycgType->text()) == cLzTypeName.indexOf(m_lzType->text()) )
         {
-            m_startRun->setEnabled(true);
+            if(vm()->vmState() == vmIdle){m_startRun->setEnabled(true);}
             m_typeMate->setText(cnStr("类型匹配成功"));
             m_typeMate->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
             controlPara()->m_runType = cYcgTypeName.indexOf(m_ycgType->text()) + 1;
@@ -187,6 +189,14 @@ void ControlWidget::setRunTtpe(QByteArray p_runType)
 
 void ControlWidget::setTwistPara(double p_twistPara)
 {
+    if(p_twistPara < 1)
+    {
+        p_twistPara = 1;
+    }
+    else if(p_twistPara > 5)
+    {
+        p_twistPara = 5;
+    }
     controlPara()->m_twist = p_twistPara * 10;
 }
 

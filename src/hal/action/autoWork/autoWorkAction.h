@@ -4,13 +4,14 @@ class IActionState;
 class CAutoWorkAction : public IAction
 {
     friend class CAutoWorkIdleState;
+    friend class CSendRunType;
+    friend class CAutoStop;
     friend class CWaitYCGVision;
     friend class CWaitLZVision;
     friend class CYCGVision;
     friend class CLZVision;
     friend class CWaitYCGAction;
     friend class CWaitLZAction;
-    friend class CSendRunType;
 
     Q_OBJECT
 public:
@@ -21,6 +22,8 @@ public:
     virtual void stop() override;
 
 protected:
+    IActionState* m_idle;
+    IActionState* m_autoStop;
     IActionState* m_sendRunType;
     quint16 m_runType;
     quint16 m_twist;
@@ -32,6 +35,4 @@ protected:
     IActionState* m_waitLZVision;
     IActionState* m_LZVision;
     IActionState* m_waitLZAction;
-
-    IActionState* m_idle;
 };

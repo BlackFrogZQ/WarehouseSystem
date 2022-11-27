@@ -5,9 +5,9 @@
 
 CAutoWorkAction::CAutoWorkAction(CVM *p_vm): IAction(p_vm), m_runType(0xffff)
 {
-    m_sendRunType = new CSendRunType(this);
-
     m_idle = new CAutoWorkIdleState(this);
+    m_autoStop = new CAutoStop(this);
+    m_sendRunType = new CSendRunType(this);
 
     m_waitYCGVision= new CWaitYCGVision(this);
     m_YCGVision= new CYCGVision(this);
@@ -21,6 +21,8 @@ CAutoWorkAction::CAutoWorkAction(CVM *p_vm): IAction(p_vm), m_runType(0xffff)
 CAutoWorkAction::~CAutoWorkAction()
 {
     delPtr(m_idle);
+    delPtr(m_autoStop);
+    delPtr(m_sendRunType);
     delPtr(m_waitYCGVision);
     delPtr(m_YCGVision);
     delPtr(m_waitYCGAction);

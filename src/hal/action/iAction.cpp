@@ -35,3 +35,15 @@ IAction *CActionCreater::autoWorkAction()
 {
     return new CAutoWorkAction(m_pVM);
 }
+
+
+CAutoRun* autoRun()
+{
+    static CAutoRun gAutoRun;
+    return &gAutoRun;
+}
+
+bool CAutoRun::getAutoRun() const
+{
+    return isAutoRun;
+}

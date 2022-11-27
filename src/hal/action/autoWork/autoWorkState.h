@@ -79,3 +79,12 @@ public:
     virtual void run() override;
     virtual void runing() override;
 };
+
+class CAutoStop:public CAutoWorkIdleState
+{
+    Q_OBJECT
+public:
+    using CAutoWorkIdleState::CAutoWorkIdleState;
+    virtual void run() override;
+    virtual void runing() override;
+};
