@@ -162,6 +162,8 @@ void CAutoStop::runing()
     }
     else
     {
+        autoRun()->isAutoRun = false;
+        vm()->sendDisColis(cpdcAutoStop, false);
         changeState(m_action->m_idle);
         return;
     }

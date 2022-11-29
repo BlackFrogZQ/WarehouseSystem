@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
     {
         initSystemService();
         CMainWindow w;
-        w.show();
-        // w.showFullScreen();
+        // w.show();
+        w.showFullScreen();
         int code = a.exec();
         closeSystemService();
         return code;
