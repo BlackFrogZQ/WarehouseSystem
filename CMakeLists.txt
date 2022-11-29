@@ -61,7 +61,9 @@ set(paraServerCpp
     src/para/define/paraDef.cpp
     src/para/define/pcDef.cpp
     src/para/define/cameraDef.cpp
+    src/para/define/roiRegionYcgDef.cpp
     src/para/define/cameraLzDef.cpp
+    src/para/define/roiRegionLzDef.cpp
     src/para/define/scannerDef.cpp)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/ui)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/hal)

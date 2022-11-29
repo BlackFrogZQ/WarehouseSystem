@@ -48,6 +48,7 @@ void deleteLayout(QLayout *p_layout)
 };
 
 double CUiBasic::stScale = CUiBasic::getDefScale();
+bool CUiBasic::isTop = false;
 
 double CUiBasic::getDefScale()
 {

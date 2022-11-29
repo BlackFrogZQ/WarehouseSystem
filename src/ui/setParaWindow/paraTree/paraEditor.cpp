@@ -35,11 +35,13 @@ CParaEditor::CParaEditor(QWidget *parent, const CParaNodeAttributes& p_nodeAttri
                     QRadioButton{\
                         background-color: transparent;}\
                     QRadioButton::indicator:unchecked{\
-                        image: url(:/res/para/closs.png);}\
+                        image: url(%3);}\
                     QRadioButton::indicator:checked {\
-                        image: url(:/res/para/open.png);}")
+                        image: url(%4);}")
                                    .arg(w)
-                                   .arg(h));
+                                   .arg(h)
+                                   .arg(cBoolCloseIco)
+                                   .arg(cBoolOpenIco));
     }
     break;
     case pntEnum:

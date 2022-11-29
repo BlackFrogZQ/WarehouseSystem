@@ -1,5 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 	<qresource>
 	<file>res/assemble.png</file>
+	<file>res/close.png</file>
+	<file>res/open.png</file>
 	</qresource>
 </RCC>

@@ -17,55 +17,12 @@ namespace TIGER_ProcessTool
     {
     }
 
-    bool CStationMatch::processImage(bool p_processYcg)
+    bool CStationMatch::processImage(bool p_processYcg, const QImage &p_qImage, const QPainterPath &p_path)
     {
         m_isError = true;
 
-        if(p_processYcg == true)
-        {
-            if (baslerCamera()->isAcquire())
-            {
-                qInfo() << cnStr("延长杆相机正在采集，正在尝试停止相机采集");
-                if (baslerCamera()->acquireChange())
-                {
-                    qInfo() << cnStr("停止相机采集成功");
-                }
-                else
-                {
-                    m_error = cnStr("停止相机采集失败，无法拍照识别");
-                    return false;
-                }
-            }
-            if (!(baslerCamera()->connected() && baslerCamera()->singleFrame()))
-            {
-                m_error = cnStr("相机采集失败，无法拍照识别");
-                return false;
-            }
-            m_markImage = baslerCamera()->getLastImage();
-        }
-        else
-        {
-            if (baslerCameraLz()->isAcquire())
-            {
-                qInfo() << cnStr("螺柱相机正在采集，正在尝试停止相机采集");
-                if (baslerCameraLz()->acquireChange())
-                {
-                    qInfo() << cnStr("停止相机采集成功");
-                }
-                else
-                {
-                    m_error = cnStr("停止相机采集失败，无法拍照识别");
-                    return false;
-                }
-            }
-            if (!(baslerCameraLz()->connected() && baslerCameraLz()->singleFrame()))
-            {
-                m_error = cnStr("相机采集失败，无法拍照识别");
-                return false;
-            }
-            m_markImage = baslerCameraLz()->getLastImage();
-        }
-
+        // Qt图像转换为Halcon图像
+        m_markImage = p_qImage;
         HImage hImage;
         if (!TIGER_HalconTool::qimgToHimg(m_markImage, hImage))
         {
@@ -73,21 +30,36 @@ namespace TIGER_ProcessTool
             return false;
         }
 
+        // Qt区域转换为Halcon区域
+        QImage qRoiImage = p_qImage;
+        if (qRoiImage.isNull())
+        {
+            myInfo << cnStr("传入图像为空！");
+            return false;
+        }
+        qRoiImage.fill(Qt::white);
+        QPainter painter(&qRoiImage);
+        painter.setPen(Qt::black);
+        painter.setBrush(Qt::black);
+        painter.drawPath(p_path);
+        HImage hRoiImage;
+        if (!TIGER_HalconTool::qimgToHimg(qRoiImage, hRoiImage))
+        {
+            myInfo << cnStr("图像转换失败，无法识别处理");
+            return false;
+        }
+        HObject hRoiRegion;
+        HalconCpp::Threshold(hRoiImage, &hRoiRegion, 0, 1);
+
+        //方向判断
         IDiscernDirection *pFeaturesPositioning = createDiscernPositioning(p_processYcg);
-        if (!pFeaturesPositioning->processUnionRegion(hImage, m_markImage.size()))
+        if (!pFeaturesPositioning->processUnionRegion(hImage, hRoiRegion, m_markImage.size()))
         {
             m_error = cnStr("识别失败：%1").arg(pFeaturesPositioning->getErrorMsg());
             delPtr(pFeaturesPositioning);
             return false;
         }
         m_direction = pFeaturesPositioning->getDirection();
-
-        if (!TIGER_HalconTool::himgToQimg(hImage, m_markImage))
-        {
-            m_error = cnStr("Halcon图像转换为QImage失败，无法显示图像");
-            delPtr(pFeaturesPositioning);
-            return false;
-        }
         delPtr(pFeaturesPositioning);
         m_isError = false;
         return true;

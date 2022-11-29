@@ -11,7 +11,7 @@ namespace TIGER_ProcessTool
     public:
         CStationMatch();
         ~CStationMatch();
-        bool processImage(bool p_processYcg);
+        bool processImage(bool p_processYcg, const QImage &p_qImage, const QPainterPath &p_path);
         bool getDirection() const { return m_direction; };
         QImage getMarkImage();
         QString getErrorMsg() const;

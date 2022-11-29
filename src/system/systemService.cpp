@@ -142,7 +142,6 @@ void initSystemService()
 void closeSystemService()
 {
     sys()->save();
-
     delete g_sysService;
     g_sysService = nullptr;
 }

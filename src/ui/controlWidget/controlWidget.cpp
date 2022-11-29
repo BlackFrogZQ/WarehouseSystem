@@ -94,11 +94,15 @@ void ControlWidget::initLayout()
     connect(m_systemPara, &QPushButton::clicked, this, [=](){
         CSetParaWindow setParaWindow;
         setParaWindow.setShowNode(TIGER_ParaDef::paraRootNode());
-        setParaWindow.exec();
-        if (QMessageBox::Yes ==
-        QMessageBox::question(this, cnStr("保存参数"), cnStr("是否重启系统保存参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
+        bool isSave = setParaWindow.isSave();
+        isSave ? sys()->save() : sys()->load();
+        if(isSave)
         {
-            sys()->restartSys();
+            if(QMessageBox::Yes ==
+            QMessageBox::question(this, cnStr("加载参数"), cnStr("是否重启系统加载参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
+            {
+                sys()->restartSys();
+            }
         }});
 
     //汇总

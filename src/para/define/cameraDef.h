@@ -4,14 +4,14 @@ namespace TIGER_CameraDef
 {
 	struct CCameraPara
 	{
+		QString ip;
 		int exposureTime;
 		int heartbeatTime;
-		QString ip;
 		CCameraPara::CCameraPara()
 		{
+			ip = "169.254.169.99";
 			exposureTime = 35000;
 			heartbeatTime = 5000;
-			ip = "169.254.169.99";
 		};
 	};
 	CCameraPara *cameraParas();

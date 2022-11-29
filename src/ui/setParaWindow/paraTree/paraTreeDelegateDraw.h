@@ -103,8 +103,8 @@ void drawText(QPainter *painter, const QStyleOptionViewItem &option, const CPara
         {
         case pntBool:
         {
-            QPixmap pix = QPixmap(index.data().toBool() ? ":/res/open.png" : ":/res/closs.png").scaled(width - height, height, Qt::KeepAspectRatio);
-            painter->drawPixmap(x + height + (width - height - pix.width()) / 2, y + (height - pix.height()) / 2, pix.width(), pix.height(), pix);
+            QPixmap pix = QPixmap(index.data().toBool() ? cBoolOpenIco : cBoolCloseIco).scaled(width, height, Qt::KeepAspectRatio);
+            painter->drawPixmap(x  + (width - pix.width()) / 2, y + (height - pix.height()) / 2, pix.width(), pix.height(), pix);
             return;
         }
         case pntEnum:

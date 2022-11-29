@@ -4,11 +4,14 @@
 #include "system/tool/halconTool.h"
 #include "system/basic.h"
 #include "imageProcess/imageProcess.h"
+#include "para/define/roiRegionYcgDef.h"
+#include "para/define/roiRegionLzDef.h"
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QTextBrowser>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QPainter>
 using namespace TIGER_HalconTool;
 using namespace TIGER_ProcessTool;
 
@@ -25,6 +28,8 @@ CMainWindow::CMainWindow(QWidget *parent)
     // setFixedSize(1920, 1080);// 1626 1236
     m_controlWidget = new ControlWidget;
     m_plcStateLed = new CPlcStateLed;
+    m_ycgRoiPath.addRect(TIGER_YcgRoiDef::ycgRoiParas()->x,TIGER_YcgRoiDef::ycgRoiParas()->y,TIGER_YcgRoiDef::ycgRoiParas()->w,TIGER_YcgRoiDef::ycgRoiParas()->h);
+    m_lzRoiPath.addRect(TIGER_LzRoiDef::lzRoiParas()->x,TIGER_LzRoiDef::lzRoiParas()->y,TIGER_LzRoiDef::lzRoiParas()->w,TIGER_LzRoiDef::lzRoiParas()->h);
     initLayout();
     mainWindow()->slotVideoImage(baslerCamera()->getExposureTime(), baslerCameraLz()->getExposureTime());
     connect(baslerCamera(), &TIGER_BaslerCamera::CBaslerCamera::sigGrabImage, this, &CMainWindow::slotUpdateYcgImage);
@@ -103,14 +108,20 @@ void CMainWindow::slotVideoImage(double p_YcgExposureTime, double p_LzExposureTi
 void CMainWindow::slotUpdateYcgImage(const QImage &p_image)
 {
     m_ycgImage = p_image;
-    m_ycgImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_ycgImageLabel->size(), Qt::KeepAspectRatio));
+    if(TIGER_YcgRoiDef::ycgRoiParas()->isShow)
+    {
+        QPainter painter(&m_ycgImage);
+        painter.setPen(QPen(Qt::blue,4));
+        painter.drawPath(m_ycgRoiPath);
+    }
+    m_ycgImageLabel->setPixmap(QPixmap::fromImage(m_ycgImage).scaled(m_ycgImageLabel->size(), Qt::KeepAspectRatio));
 }
 
-void CMainWindow::slotGrabYcgImage()
+bool CMainWindow::slotGrabYcgImage()
 {
     if (baslerCamera()->isAcquire())
     {
-        qInfo() << cnStr("相机正在采集，正在尝试停止相机采集");
+        qInfo() << cnStr("延长杆相机正在采集，正在尝试停止相机采集");
         if (baslerCamera()->acquireChange())
         {
             qInfo() << cnStr("停止相机采集成功");
@@ -118,28 +129,31 @@ void CMainWindow::slotGrabYcgImage()
         else
         {
             qInfo() << cnStr("停止相机采集失败，无法拍照识别");
+            return false;
         }
     }
     if (!(baslerCamera()->connected() && baslerCamera()->singleFrame()))
     {
         qInfo() << cnStr("相机采集失败，无法拍照识别");
+        return false;
     }
-    slotUpdateYcgImage(baslerCamera()->getLastImage());
+    return true;
 }
 
 bool CMainWindow::slotYcgImageDiscern(bool &p_direction)
 {
+    if(!slotGrabYcgImage()){return false;}
     TIGER_ProcessTool::CStationMatch stationMatch;
-    if (stationMatch.processImage(true))
+    if (stationMatch.processImage(true, baslerCamera()->getLastImage(), m_ycgRoiPath))
     {
         myInfo << cnStr("延长杆处理成功。");
     }
     else
     {
-        slotUpdateYcgImage(stationMatch.getMarkImage());
         qInfo() << cnStr("延长杆处理失败：%1").arg(stationMatch.getErrorMsg());
         return false;
     }
+    slotUpdateYcgImage(stationMatch.getMarkImage());
     p_direction = stationMatch.getDirection();
     return true;
 }
@@ -148,14 +162,20 @@ bool CMainWindow::slotYcgImageDiscern(bool &p_direction)
 void CMainWindow::slotUpdateLzImage(const QImage &p_image)
 {
     m_lzImage = p_image;
-    m_lzImageLabel->setPixmap(QPixmap::fromImage(p_image).scaled(m_lzImageLabel->size(), Qt::KeepAspectRatio));
+    if(TIGER_LzRoiDef::lzRoiParas()->isShow)
+    {
+        QPainter painter(&m_lzImage);
+        painter.setPen(QPen(Qt::blue,4));
+        painter.drawPath(m_lzRoiPath);
+    }
+    m_lzImageLabel->setPixmap(QPixmap::fromImage(m_lzImage).scaled(m_lzImageLabel->size(), Qt::KeepAspectRatio));
 }
 
-void CMainWindow::slotGrabLzImage()
+bool CMainWindow::slotGrabLzImage()
 {
     if (baslerCameraLz()->isAcquire())
     {
-        qInfo() << cnStr("相机正在采集，正在尝试停止相机采集");
+        qInfo() << cnStr("螺柱相机正在采集，正在尝试停止相机采集");
         if (baslerCameraLz()->acquireChange())
         {
             qInfo() << cnStr("停止相机采集成功");
@@ -163,28 +183,31 @@ void CMainWindow::slotGrabLzImage()
         else
         {
             qInfo() << cnStr("停止相机采集失败，无法拍照识别");
+            return false;
         }
     }
     if (!(baslerCameraLz()->connected() && baslerCameraLz()->singleFrame()))
     {
         qInfo() << cnStr("相机采集失败，无法拍照识别");
+        return false;
     }
-    slotUpdateLzImage(baslerCameraLz()->getLastImage());
+    return true;
 }
 
 bool CMainWindow::slotLzImageDiscern(bool &p_direction)
 {
+    if(!slotGrabLzImage()){return false;}
     TIGER_ProcessTool::CStationMatch stationMatch;
-    if (stationMatch.processImage(false))
+    if (stationMatch.processImage(false, baslerCameraLz()->getLastImage(), m_lzRoiPath))
     {
         qInfo() << cnStr("螺柱处理成功。");
     }
     else
     {
-        slotUpdateLzImage(stationMatch.getMarkImage());
         qInfo() << cnStr("螺柱处理失败：%1").arg(stationMatch.getErrorMsg());
         return false;
     }
+    slotUpdateLzImage(stationMatch.getMarkImage());
     p_direction = stationMatch.getDirection();
     return true;
 }

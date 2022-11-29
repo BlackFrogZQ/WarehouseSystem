@@ -23,8 +23,8 @@ public slots:
     void slotVideoImage(double p_YcgExposureTime, double p_LzExposureTime);
     void slotUpdateYcgImage(const QImage &p_image);
     void slotUpdateLzImage(const QImage &p_image);
-    void slotGrabYcgImage();
-    void slotGrabLzImage();
+    bool slotGrabYcgImage();
+    bool slotGrabLzImage();
     bool slotYcgImageDiscern(bool &p_direction);
     bool slotLzImageDiscern(bool &p_direction);
 
@@ -38,6 +38,9 @@ protected:
 
     QImage m_ycgImage;
     QImage m_lzImage;
+
+    QPainterPath m_ycgRoiPath;
+    QPainterPath m_lzRoiPath;
 };
 
 CMainWindow *mainWindow();

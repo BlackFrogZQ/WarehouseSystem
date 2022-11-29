@@ -4,23 +4,19 @@
 namespace TIGER_ProcessTool
 {
     using namespace HalconCpp;
-    bool CYcgDiscern::processUnionRegion(const HalconCpp::HObject &p_image, QSize p_imageSize)
+    bool CYcgDiscern::processUnionRegion(const HalconCpp::HObject &p_image, const HalconCpp::HObject &p_roiRegion, QSize p_imageSize)
     {
         m_error.clear();
         try
         {
-            //********调整曝光及读取ROI
-            HObject roiRegion;
-            ReadRegion(&roiRegion, "ycgRoiRegion.hobj");
-            ReduceDomain(p_image, roiRegion, &m_hObject);
-
             //********得到最靠近接近开关的延长杆
+            ReduceDomain(p_image, p_roiRegion, &m_hObject);
             Threshold(m_hObject, &m_hObject, 210, 255);
             Connection(m_hObject, &m_hObject);
 
             //得到中间的区域
             HTuple areaRoi, rowRoi, columnRoi;
-            AreaCenter(roiRegion, &areaRoi, &rowRoi, &columnRoi);
+            AreaCenter(p_roiRegion, &areaRoi, &rowRoi, &columnRoi);
             SelectShape(m_hObject, &m_hObject, "column", "and", columnRoi - 30, columnRoi + 30);
 
             //去除多余区域

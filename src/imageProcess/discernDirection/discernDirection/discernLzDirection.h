@@ -6,6 +6,6 @@ namespace TIGER_ProcessTool
     {
     public:
         using IDiscernDirection::IDiscernDirection;
-        virtual bool processUnionRegion(const HalconCpp::HObject &p_image, QSize p_imageSize);
+        virtual bool processUnionRegion(const HalconCpp::HObject &p_image, const HalconCpp::HObject &p_roiRegion, QSize p_imageSize);
     };
 };

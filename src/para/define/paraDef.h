@@ -27,7 +27,8 @@ namespace TIGER_ParaDef
 		pntRoot,
 		pntSum,
 	};
-
+	const QString cBoolCloseIco = ":/res/close.png";
+	const QString cBoolOpenIco = ":/res/open.png";
 	const QString cValueName = "value";
 	const QString cCnName = "cnName";
 	const QString cRemark = "remark";
