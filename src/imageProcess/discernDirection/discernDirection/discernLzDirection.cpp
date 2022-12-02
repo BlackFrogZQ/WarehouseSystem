@@ -52,6 +52,12 @@ namespace TIGER_ProcessTool
             HObject selectedRegionsOriginal;
             SelectShape(m_hObject, &selectedRegionsOriginal, "row", "and", HTuple(rowAll[numberAll - 1]), p_imageSize.height());
 
+            //得到左边区域
+            HTuple rowNear1, columnNear1, rowNear2, columnNear2;
+            SmallestRectangle1(selectedRegionsOriginal, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
+            GenRectangle1(&m_hObject, 0, columnNear1, p_imageSize.height(), columnRoi);
+            Intersection(selectedRegionsOriginal, m_hObject, &selectedRegionsOriginal);
+
             //对区域进行处理
             HObject selectedRegionsNear;
             OpeningCircle(selectedRegionsOriginal, &selectedRegionsNear, 2);
@@ -102,26 +108,30 @@ namespace TIGER_ProcessTool
             // }
 
             //*****************判断方向***************
-            //得到左边区域
-            HObject rectangleLeft;
-            GenRectangle1(&rectangleLeft, 0, columnRoi - 40, p_imageSize.height(), columnRoi);
-            Intersection(rectangleLeft, selectedRegionsNear, &rectangleLeft);
+            //对左边区域进行处理
+            SmallestRectangle1(selectedRegionsNear, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
+            GenRectangle1(&m_hObject, rowNear2, columnNear1, rowNear2, columnNear2);
+            Intersection(selectedRegionsNear, m_hObject, &m_hObject);
+
+            HTuple rowMid1, columnMid1, rowMid2, columnMid2;
+            SmallestRectangle1(m_hObject, &rowMid1, &columnMid1, &rowMid2, &columnMid2);
+            GenRectangle1(&m_hObject, rowNear1, columnNear1, rowMid2, columnMid1 + ((columnMid2 -columnMid1)/2));
+            Intersection(selectedRegionsNear, m_hObject, &m_hObject);
 
             //得到小面积区域
             HTuple areaMin, rowMin, columnMin;
             HTuple row1, column1, row2, column2;
-            SmallestRectangle1(rectangleLeft, &row1, &column1, &row2, &column2);
-            GenRectangle1(&rectangleLeft, row2 - 50, column1, row2 + 50, column2);
-            Intersection(selectedRegionsNear, rectangleLeft, &rectangleLeft);
+            SmallestRectangle1(m_hObject, &row1, &column1, &row2, &column2);
+            GenRectangle1(&m_hObject, row2 - 80, column1, row2 + 50, column2);
+            Intersection(selectedRegionsNear, m_hObject, &m_hObject);
 
             //得到小面积区域两端区域的长度比值
-            HTuple rowNear1, columnNear1, rowNear2, columnNear2;
-            SmallestRectangle1(rectangleLeft, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
+            SmallestRectangle1(m_hObject, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
 
             HObject RectangleBehind, RegionIntersectionBehind;
             HTuple AreaBehind, RowBehind, ColumnBehind, RowBehind1, ColumnBehind1, RowBehind2, ColumnBehind2, LengthBehind;
             GenRectangle1(&RectangleBehind, rowNear1, columnNear1, rowNear1 + 10, columnNear2);
-            Intersection(rectangleLeft, RectangleBehind, &RegionIntersectionBehind);
+            Intersection(m_hObject, RectangleBehind, &RegionIntersectionBehind);
             AreaCenter(RegionIntersectionBehind, &AreaBehind, &RowBehind, &ColumnBehind);
             SmallestRectangle1(RegionIntersectionBehind, &RowBehind1, &ColumnBehind1, &RowBehind2, &ColumnBehind2);
             LengthBehind = ColumnBehind2 - ColumnBehind1;
@@ -129,7 +139,7 @@ namespace TIGER_ProcessTool
             HObject RectangleFront, RegionIntersectionFront;
             HTuple AreaFront, RowFront, ColumnFront, RowFront1, ColumnFront1, RowFront2, ColumnFront2, LengthFront;
             GenRectangle1(&RectangleFront, rowNear2 - 10, columnNear1, rowNear2, columnNear2);
-            Intersection(rectangleLeft, RectangleFront, &RegionIntersectionFront);
+            Intersection(m_hObject, RectangleFront, &RegionIntersectionFront);
             AreaCenter(RegionIntersectionFront, &AreaFront, &RowFront, &ColumnFront);
             SmallestRectangle1(RegionIntersectionFront, &RowFront1, &ColumnFront1, &RowFront2, &ColumnFront2);
             LengthFront = ColumnFront2 - ColumnFront1;

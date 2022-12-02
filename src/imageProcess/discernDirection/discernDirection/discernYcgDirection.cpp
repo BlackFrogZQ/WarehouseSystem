@@ -14,11 +14,6 @@ namespace TIGER_ProcessTool
             Threshold(m_hObject, &m_hObject, 210, 255);
             Connection(m_hObject, &m_hObject);
 
-            //得到中间的区域
-            HTuple areaRoi, rowRoi, columnRoi;
-            AreaCenter(p_roiRegion, &areaRoi, &rowRoi, &columnRoi);
-            SelectShape(m_hObject, &m_hObject, "column", "and", columnRoi - 30, columnRoi + 30);
-
             //去除多余区域
             SelectShape(m_hObject, &m_hObject, "area", "and", 1000, 99999999);
             ClosingCircle(m_hObject, &m_hObject, 10);
@@ -65,9 +60,19 @@ namespace TIGER_ProcessTool
             FillUp(selectedRegionsNear, &selectedRegionsNear);
             ShapeTrans(selectedRegionsNear, &selectedRegionsNear, "convex");
 
+            //去除直振导轨两边的磨损
+            HTuple rowNear1, columnNear1, rowNear2, columnNear2;
+            SmallestRectangle1(selectedRegionsNear, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
+            GenRectangle1(&m_hObject, rowNear1, columnNear1 + ((columnNear2 - columnNear1)/2), rowNear2, columnNear2 - ((columnNear2 - columnNear1)/2));
+            Intersection(selectedRegionsNear, m_hObject, &m_hObject);
+
+            HTuple rowMid1, columnMid1, rowMid2, columnMid2;
+            SmallestRectangle1(m_hObject, &rowMid1, &columnMid1, &rowMid2, &columnMid2);
+            GenRectangle1(&m_hObject, rowMid1, columnNear1, rowMid2, columnNear2);
+            Intersection(selectedRegionsNear, m_hObject, &selectedRegionsNear);
+
             //********判断方向
             //得到小面积区域两端区域的长度比值
-            HTuple rowNear1, columnNear1, rowNear2, columnNear2;
             SmallestRectangle1(selectedRegionsNear, &rowNear1, &columnNear1, &rowNear2, &columnNear2);
 
             HObject RectangleBehind, RegionIntersectionBehind;

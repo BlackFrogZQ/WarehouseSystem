@@ -28,8 +28,12 @@ CMainWindow::CMainWindow(QWidget *parent)
     // setFixedSize(1920, 1080);// 1626 1236
     m_controlWidget = new ControlWidget;
     m_plcStateLed = new CPlcStateLed;
-    m_ycgRoiPath.addRect(TIGER_YcgRoiDef::ycgRoiParas()->x,TIGER_YcgRoiDef::ycgRoiParas()->y,TIGER_YcgRoiDef::ycgRoiParas()->w,TIGER_YcgRoiDef::ycgRoiParas()->h);
-    m_lzRoiPath.addRect(TIGER_LzRoiDef::lzRoiParas()->x,TIGER_LzRoiDef::lzRoiParas()->y,TIGER_LzRoiDef::lzRoiParas()->w,TIGER_LzRoiDef::lzRoiParas()->h);
+    m_ycgRoiPath.addRect(TIGER_YcgRoiDef::ycgRoiParas()->x, TIGER_YcgRoiDef::ycgRoiParas()->y, TIGER_YcgRoiDef::ycgRoiParas()->w, TIGER_YcgRoiDef::ycgRoiParas()->h);
+    m_ycgRoiPath.moveTo(TIGER_YcgRoiDef::ycgRoiParas()->x + (TIGER_YcgRoiDef::ycgRoiParas()->w)/2, TIGER_YcgRoiDef::ycgRoiParas()->y);
+    m_ycgRoiPath.lineTo(TIGER_YcgRoiDef::ycgRoiParas()->x + (TIGER_YcgRoiDef::ycgRoiParas()->w)/2, TIGER_YcgRoiDef::ycgRoiParas()->y + TIGER_YcgRoiDef::ycgRoiParas()->h);
+    m_lzRoiPath.addRect(TIGER_LzRoiDef::lzRoiParas()->x, TIGER_LzRoiDef::lzRoiParas()->y, TIGER_LzRoiDef::lzRoiParas()->w, TIGER_LzRoiDef::lzRoiParas()->h);
+    m_lzRoiPath.moveTo(TIGER_LzRoiDef::lzRoiParas()->x + (TIGER_LzRoiDef::lzRoiParas()->w)/2, TIGER_LzRoiDef::lzRoiParas()->y);
+    m_lzRoiPath.lineTo(TIGER_LzRoiDef::lzRoiParas()->x + (TIGER_LzRoiDef::lzRoiParas()->w)/2, TIGER_LzRoiDef::lzRoiParas()->y + TIGER_LzRoiDef::lzRoiParas()->h);
     initLayout();
     mainWindow()->slotVideoImage(baslerCamera()->getExposureTime(), baslerCameraLz()->getExposureTime());
     connect(baslerCamera(), &TIGER_BaslerCamera::CBaslerCamera::sigGrabImage, this, &CMainWindow::slotUpdateYcgImage);
