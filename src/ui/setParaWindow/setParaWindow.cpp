@@ -16,10 +16,10 @@ CSetParaWindow::CSetParaWindow(QWidget *parent)
     setWindowFlag(Qt::WindowStaysOnTopHint, CUiBasic::isTop);
     setWindowFlag(Qt::WindowCloseButtonHint, false);
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
-
     setWindowTitle(cnStr("设置参数"));
     setMinimumSize(725 * CUiBasic::getScale(), 544 * CUiBasic::getScale());
     setAutoFillBackground(true);
+
     m_treeView = new QTreeView;
     m_treeView->setIndentation(0);
     m_treeView->setWordWrap(true);
@@ -28,6 +28,7 @@ CSetParaWindow::CSetParaWindow(QWidget *parent)
     m_treeView->setItemDelegate(new CParaTreeDelegate);
     m_treeView->setModel(m_pTreeModel);
     m_treeView->header()->setSectionResizeMode(QHeaderView::Stretch);
+
     auto pSave = new QPushButton(cnStr("保存"));
     connect(pSave,&QPushButton::clicked,this,[this](){m_bIsSave = true;this->close();});
     auto pCancel= new QPushButton(cnStr("取消"));
@@ -37,6 +38,7 @@ CSetParaWindow::CSetParaWindow(QWidget *parent)
     pbLayout->addWidget(pSave);
     pbLayout->addWidget(pCancel);
     pbLayout->setMargin(0);
+
     QVBoxLayout *hLayout = new QVBoxLayout;
     hLayout->addWidget(m_treeView);
     hLayout->addLayout(pbLayout);

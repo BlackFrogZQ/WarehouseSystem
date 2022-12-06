@@ -19,6 +19,7 @@ protected:
 
 protected slots:
     void vmStateUpdate();
+    void countUpdate();
     void setRunTtpe(QByteArray p_readType);
     void setTwistPara(double p_twistPara);
 
@@ -30,7 +31,11 @@ protected:
 
     QLineEdit *m_ycgType;
     QLineEdit *m_lzType;
-    QLabel *m_typeMate;
+    QPushButton *m_assemblyType;
+
+    QLabel *m_allCount;
+    QLabel *m_okCount;
+    QLabel *m_ngCount;
 };
 
 struct CControlPara

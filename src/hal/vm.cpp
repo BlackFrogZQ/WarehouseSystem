@@ -3,7 +3,7 @@
 #include "communication/serialPort/serialPort.h"
 #include "action/iAction.h"
 #include "para/define/scannerDef.h"
-#include "para/define/pcDef.h"
+#include "para/define/communicationDef.h"
 
 static CVM *g_Vm = nullptr;
 CVM *vm()

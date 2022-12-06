@@ -25,7 +25,7 @@ CMainWindow::CMainWindow(QWidget *parent)
     : QDialog(parent)
 {
     g_pMainWindow = this;
-    // setFixedSize(1920, 1080);// 1626 1236
+    setFixedSize(1920, 1080);// 1626 1236
     m_controlWidget = new ControlWidget;
     m_plcStateLed = new CPlcStateLed;
     m_ycgRoiPath.addRect(TIGER_YcgRoiDef::ycgRoiParas()->x, TIGER_YcgRoiDef::ycgRoiParas()->y, TIGER_YcgRoiDef::ycgRoiParas()->w, TIGER_YcgRoiDef::ycgRoiParas()->h);

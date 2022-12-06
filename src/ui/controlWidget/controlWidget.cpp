@@ -1,10 +1,12 @@
 ﻿#include "controlWidget.h"
 #include "ui/mainWindow.h"
+#include "ui/setParaWindow/setParaWindow.h"
+#include "ui/assemblyTypeWindow/assemblyTypeWindow.h"
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
+#include "hal/communication/plcSigDef.h"
 #include "hal/vm.h"
 #include "system/systemService.h"
-#include "ui/setParaWindow/setParaWindow.h"
 #include "para/define/paraDef.h"
 #include <QGridLayout>
 #include <QDoubleSpinBox>
@@ -16,6 +18,7 @@ ControlWidget::ControlWidget(): QLabel(nullptr)
     this->setStyleSheet(QString("#ControlWidget{%1};").arg(cStyleSheet ));
     initLayout();
     connect(vm(), &CVM::sigVMStateUpdate, this, &ControlWidget::vmStateUpdate);
+    connect(vm(),&CVM::sigPlcSigUpdate,this,&ControlWidget::countUpdate);
     connect(vm(), &CVM::sigRunType, this, &ControlWidget::setRunTtpe);
     vmStateUpdate();
 }
@@ -48,17 +51,6 @@ void ControlWidget::initLayout()
         return led;
     };
 
-    //装配型号
-    QLabel *pLabelYcgType = new QLabel;
-    pLabelYcgType = getLed(cnStr("延长杆型号："));
-    m_ycgType = getLineEdit();
-    QLabel *pLabelLzType = new QLabel;
-    pLabelLzType = getLed(cnStr("螺柱型号："));
-    m_lzType = getLineEdit();
-    m_typeMate = getLed(cnStr("类型匹配"));
-    m_typeMate->setFixedHeight(140);
-    m_typeMate->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
     //PLC控制
     m_reset = new QPushButton(cnStr("复位"));
     setAttr(m_reset);
@@ -72,9 +64,30 @@ void ControlWidget::initLayout()
         if(vm()->vmState() == vmIdle){return;}
         vm()->stopWork();});
 
+    //装配型号
+    QLabel *pLabelYcgType = new QLabel;
+    pLabelYcgType = getLed(cnStr("延长杆型号："));
+    m_ycgType = getLineEdit();
+    m_ycgType->setPlaceholderText(cnStr("延长杆型号"));
+    QLabel *pLabelLzType = new QLabel;
+    pLabelLzType = getLed(cnStr("螺柱型号："));
+    m_lzType = getLineEdit();
+    m_lzType->setPlaceholderText(cnStr("螺柱型号"));
+    m_assemblyType = new QPushButton(cnStr("选择装配类型"));
+    setAttr(m_assemblyType);
+    connect(m_assemblyType, &QPushButton::clicked, this, [=](){
+        CAssemblyType pAssemblyType;
+        int item;
+        if(pAssemblyType.getCurrentItem(item) == true)
+        {
+            m_ycgType->setText(cYcgTypeName[item]);
+            m_lzType->setText(cLzTypeName[item]);
+            controlPara()->m_runType = item;
+        }});
+
     //扭矩
     QLabel *pLabelTwist = new QLabel;
-    pLabelTwist = getLed(cnStr("设置扭矩值："));
+    pLabelTwist = getLed(cnStr("设置装配扭矩："));
     QDoubleSpinBox* twist = new QDoubleSpinBox(this);
     twist->setMinimum(0.5);
     twist->setMaximum(30);
@@ -87,7 +100,6 @@ void ControlWidget::initLayout()
     twist->setStyleSheet(cStyleSheet);
     twist->setFocusPolicy(Qt::NoFocus);
     connect(twist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ControlWidget::setTwistPara);
-
     //系统参数设置
     m_systemPara = new QPushButton(cnStr("系统参数设置"));
     setAttr(m_systemPara);
@@ -105,19 +117,40 @@ void ControlWidget::initLayout()
             }
         }});
 
+    //计数
+    QLabel *pLabelAll = new QLabel;
+    pLabelAll = getLed(cnStr("装配总数："));
+    QLabel *pLabelOk = new QLabel;
+    pLabelOk = getLed(cnStr("合格个数："));
+    QLabel *pLabelNg = new QLabel;
+    pLabelNg = getLed(cnStr("不合格数："));
+    m_allCount = new QLabel("0");
+    setAttr(m_allCount);
+    m_allCount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    m_okCount = new QLabel("0");
+    setAttr(m_okCount);
+    m_okCount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    m_ngCount = new QLabel("0");
+    setAttr(m_ngCount);
+    m_ngCount->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
     //汇总
     QGridLayout *pLayoutButton = new QGridLayout();
-    pLayoutButton->addWidget(m_reset, 0, 0, 1, 1);
-    pLayoutButton->addWidget(m_startRun, 0, 1, 1, 1);
-    pLayoutButton->addWidget(m_crashStop, 0, 2, 1, 1);
-    pLayoutButton->addWidget(pLabelTwist, 1, 0, 1, 1);
-    pLayoutButton->addWidget(twist, 1, 1, 1, 1);
-    pLayoutButton->addWidget(m_systemPara, 1, 2, 1, 1);
-    pLayoutButton->addWidget(pLabelYcgType, 2, 0, 1, 1);
-    pLayoutButton->addWidget(m_ycgType, 2, 1, 1, 1);
-    pLayoutButton->addWidget(pLabelLzType, 3, 0, 1, 1);
-    pLayoutButton->addWidget(m_lzType, 3, 1, 1, 1);
-    pLayoutButton->addWidget(m_typeMate, 2, 2, 2, 1);
+    pLayoutButton->addWidget(m_reset, 0, 0, 1, 2);
+    pLayoutButton->addWidget(m_startRun, 0, 2, 1, 2);
+    pLayoutButton->addWidget(m_crashStop, 0, 4, 1, 2);
+    pLayoutButton->addWidget(m_ycgType, 1, 0, 1, 2);
+    pLayoutButton->addWidget(m_lzType, 1, 2, 1, 2);
+    pLayoutButton->addWidget(m_assemblyType, 1, 4, 1, 2);
+    pLayoutButton->addWidget(pLabelTwist, 2, 0, 1, 2);
+    pLayoutButton->addWidget(twist, 2, 2, 1, 2);
+    pLayoutButton->addWidget(m_systemPara, 2, 4, 1, 2);
+    pLayoutButton->addWidget(pLabelAll, 3, 0, 1, 1);
+    pLayoutButton->addWidget(m_allCount, 3, 1, 1, 1);
+    pLayoutButton->addWidget(pLabelOk, 3, 2, 1, 1);
+    pLayoutButton->addWidget(m_okCount, 3, 3, 1, 1);
+    pLayoutButton->addWidget(pLabelNg, 3, 4, 1, 1);
+    pLayoutButton->addWidget(m_ngCount, 3, 5, 1, 1);
     pLayoutButton->setMargin(0);
     pLayoutButton->setSizeConstraint(QGridLayout::SetMinimumSize);
     this->setMinimumSize(pLayoutButton->sizeHint());
@@ -132,27 +165,33 @@ void ControlWidget::vmStateUpdate()
         m_reset->setEnabled(true);
         m_crashStop->setEnabled(true);
         m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
-        // m_systemPara->setEnabled(true);
         break;
     case vmReset:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
-        // m_systemPara->setEnabled(false);
         break;
     case vmAutoWork:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(true);
-        // m_systemPara->setEnabled(false);
         break;
     default:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
-        // m_systemPara->setEnabled(false);
         break;
     }
+}
+
+void ControlWidget::countUpdate()
+{
+    int allCount = masterData()->hold(cphAllCount);
+    int okCount = masterData()->hold(cphOkCount);
+    int ngCount = allCount - okCount;
+    m_allCount->setText(QString::number(allCount));
+    m_okCount->setText(QString::number(okCount));
+    m_ngCount->setText(QString::number(ngCount));
 }
 
 void ControlWidget::setRunTtpe(QByteArray p_runType)
@@ -178,15 +217,15 @@ void ControlWidget::setRunTtpe(QByteArray p_runType)
         if(cYcgTypeName.indexOf(m_ycgType->text()) == cLzTypeName.indexOf(m_lzType->text()) )
         {
             if(vm()->vmState() == vmIdle){m_startRun->setEnabled(true);}
-            m_typeMate->setText(cnStr("类型匹配成功"));
-            m_typeMate->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
+            m_assemblyType->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
             controlPara()->m_runType = cYcgTypeName.indexOf(m_ycgType->text()) + 1;
+            myInfo << cnStr("类型匹配成功");
         }
         else
         {
             m_startRun->setEnabled(false);
-            m_typeMate->setText(cnStr("类型匹配失败"));
-            m_typeMate->setStyleSheet("QLabel{background-color:rgb(255,0,0)}");
+            m_assemblyType->setStyleSheet("QLabel{background-color:rgb(255,0,0)}");
+            myInfo << cnStr("类型匹配失败");
         }
     }
 }

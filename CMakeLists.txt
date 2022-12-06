@@ -59,7 +59,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/system)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/para)
 set(paraServerCpp
     src/para/define/paraDef.cpp
-    src/para/define/pcDef.cpp
+    src/para/define/communicationDef.cpp
     src/para/define/cameraDef.cpp
     src/para/define/roiRegionYcgDef.cpp
     src/para/define/cameraLzDef.cpp
@@ -97,7 +97,7 @@ qt5_add_resources(sources qml.qrc)
 # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_executable(${PROJECT_NAME}
-    WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
+    # WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
     ${paraServerCpp}
     ${sources}
     main.cpp
