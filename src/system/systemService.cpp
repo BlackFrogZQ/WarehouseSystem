@@ -4,6 +4,7 @@
 #include "para/para.h"
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
+#include "hal/communication/serialPort/serialPortLed.h"
 #include "hal/vm.h"
 #include "para/define/cameraDef.h"
 #include "para/define/cameraLzDef.h"
@@ -141,6 +142,7 @@ void initSystemService()
 
 void closeSystemService()
 {
+    led()->setAll(CLED::clsOFF, CLED::clsOFF, CLED::clsOFF, CLED::clsOFF);
     sys()->save();
     delete g_sysService;
     g_sysService = nullptr;

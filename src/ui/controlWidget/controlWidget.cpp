@@ -5,6 +5,7 @@
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
 #include "hal/communication/plcSigDef.h"
+#include "hal/communication/serialPort/serialPortLed.h"
 #include "hal/vm.h"
 #include "system/systemService.h"
 #include "para/define/paraDef.h"
@@ -82,7 +83,7 @@ void ControlWidget::initLayout()
         {
             m_ycgType->setText(cYcgTypeName[item]);
             m_lzType->setText(cLzTypeName[item]);
-            controlPara()->m_runType = item;
+            controlPara()->m_runType = item+1;
         }});
 
     //扭矩
@@ -165,27 +166,37 @@ void ControlWidget::vmStateUpdate()
         m_reset->setEnabled(true);
         m_crashStop->setEnabled(true);
         m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
+        led()->setAll(CLED::clsON, CLED::clsOFF, CLED::clsOFF, CLED::clsOFF);
         break;
     case vmReset:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
+        led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
         break;
     case vmAutoWork:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(true);
+        led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
         break;
     default:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
+        led()->setAll(CLED::clsOFF, CLED::clsOFF, CLED::clsFlashed, CLED::clsFlashed);
         break;
     }
 }
 
 void ControlWidget::countUpdate()
 {
+    myInfo << masterData()->hold(cphRunType);
+    myInfo << masterData()->hold(cphYCGType);
+    myInfo << masterData()->hold(cphLZType);
+    myInfo << masterData()->hold(cphTwist);
+    myInfo << masterData()->hold(cphAllCount);
+    myInfo << masterData()->hold(cphOkCount);
     int allCount = masterData()->hold(cphAllCount);
     int okCount = masterData()->hold(cphOkCount);
     int ngCount = allCount - okCount;
@@ -242,6 +253,7 @@ void ControlWidget::setTwistPara(double p_twistPara)
     }
     controlPara()->m_twist = p_twistPara * 10;
 }
+
 
 
 CControlPara* controlPara()

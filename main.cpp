@@ -14,8 +14,9 @@ int main(int argc, char *argv[])
     {
         initSystemService();
         CMainWindow w;
-        w.show();
-        // w.showFullScreen();
+        w.setWindowTitle("AutoAssemble");
+        // w.show();
+        w.showFullScreen();
         int code = a.exec();
         closeSystemService();
         return code;

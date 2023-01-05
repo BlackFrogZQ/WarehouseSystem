@@ -2,7 +2,7 @@
 #include "communication/modbusMaster.h"
 #include "communication/serialPort/serialPort.h"
 #include "action/iAction.h"
-#include "para/define/scannerDef.h"
+#include "para/define/serialPortDef.h"
 #include "para/define/communicationDef.h"
 
 static CVM *g_Vm = nullptr;
@@ -47,7 +47,7 @@ CVM::CVM(QObject *p)
         reset();
     }
 
-    const auto portName = TIGER_ScannerDef::scannerParas()->scannerPort;
+    const auto portName = TIGER_SerialPortDef::serialPortParas()->scannerPort;
     m_pSerialPort = new CSerialPort(this);
     m_pSerialPort->setPort(portName);
     myInfo << (m_pSerialPort->slotOpenPort() ? cnStr("扫描仪连接成功") : cnStr("扫描仪连接失败"));
@@ -59,6 +59,7 @@ CVM::~CVM()
     delPtr(m_pResetAction);
     delPtr(m_pAutoWorkAction);
 }
+
 CVMState CVM::vmState() const
 {
     return m_state;

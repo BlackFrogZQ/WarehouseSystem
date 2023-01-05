@@ -40,6 +40,7 @@ bool CSerialPort::slotOpenPort()
 void CSerialPort::slotReceiveInfo()
 {
     QByteArray readData = m_serialPort->readAll();
+    // readData.insert(0,"00");
     if(!readData.isNull())
     {
         emit sendReadSignal(readData);
