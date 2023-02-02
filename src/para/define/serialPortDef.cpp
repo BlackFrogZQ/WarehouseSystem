@@ -16,8 +16,8 @@ namespace TIGER_SerialPortDef
     public:
         CSerialPortDefPara() : CParas(cnStr("serialPortParas"), cnStr("串口参数"))
         {
-            m_currentNode->appendNode({pntString, "scannerPort", cnStr("扫描仪端口"), true, cnStr("设置扫描仪端口")}, &(serialPortParas()->scannerPort));
-            m_currentNode->appendNode({pntString, "indicatorLightPort", cnStr("指示灯端口"), true, cnStr("设置指示灯端口")}, &(serialPortParas()->indicatorLightPort));
+            m_currentNode->appendNode({pntString, "indicatorLightPort", cnStr("入库扫描仪"), true, cnStr("设置入库扫描仪端口")}, &(serialPortParas()->pushStorageScanner));
+            m_currentNode->appendNode({pntString, "scannerPort", cnStr("出库扫描仪"), true, cnStr("设置出库扫描仪端口")}, &(serialPortParas()->pullStorageScanner));
         };
     };
     static CSerialPortDefPara g_scannerDefPara;

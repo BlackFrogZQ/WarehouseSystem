@@ -18,10 +18,6 @@ protected:
     void initLayout();
 
 protected slots:
-    void vmStateUpdate();
-    void countUpdate();
-    void setRunTtpe(QByteArray p_readType);
-    void setTwistPara(double p_twistPara);
 
 protected:
     QPushButton *m_reset;
@@ -37,18 +33,3 @@ protected:
     QLabel *m_okCount;
     QLabel *m_ngCount;
 };
-
-struct CControlPara
-{
-    friend class ControlWidget;
-
-public:
-    quint16 runType() const;
-    quint16 twist() const;
-
-protected:
-    quint16 m_runType = 1;
-    quint16 m_twist = 20;
-};
-
-CControlPara *controlPara();

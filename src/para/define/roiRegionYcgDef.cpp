@@ -17,11 +17,10 @@ namespace TIGER_YcgRoiDef
     public:
         CYcgRoiDefParas() : CParas(cnStr("ycgRoiPara"), cnStr("延长杆相机识别区域"), true)
         {
-            m_currentNode->appendNode({pntInt, "x", cnStr("X轴坐标"), true}, &(ycgRoiParas()->x));
-            m_currentNode->appendNode({pntInt, "y", cnStr("Y轴坐标"), true}, &(ycgRoiParas()->y));
-            m_currentNode->appendNode({pntInt, "w", cnStr("区域宽"), true}, &(ycgRoiParas()->w));
-            m_currentNode->appendNode({pntInt, "h", cnStr("区域高"), true}, &(ycgRoiParas()->h));
-            m_currentNode->appendNode({pntBool, "inShow", cnStr("显示区域"), true}, &(ycgRoiParas()->isShow));
+			for (size_t i = 0; i < cytMax-1; i++)
+			{
+                m_currentNode->appendNode({pntBool, cYcgTypeName[i], cYcgTypeName[i], true}, &(ycgRoiParas()->ycgStates[i]));
+			}
         };
     };
     static CYcgRoiDefParas g_ycgRoiDefParas;

@@ -1,17 +1,17 @@
-﻿#include "serialPort.h"
+﻿#include "pushStorage.h"
 
-CSerialPort::CSerialPort(QObject *p): QObject(p)
+CPushStorage::CPushStorage(QObject *p): QObject(p)
 {
     m_serialPort = new QSerialPort(this);
     connect(m_serialPort, &QSerialPort::errorOccurred, this, [this]{ myDebug << "modbusMaster error:" << m_serialPort->errorString(); });
-    connect(m_serialPort, &QSerialPort::readyRead, this, &CSerialPort::slotReceiveInfo);
+    connect(m_serialPort, &QSerialPort::readyRead, this, &CPushStorage::slotReceiveInfo);
 }
 
-CSerialPort::~CSerialPort()
+CPushStorage::~CPushStorage()
 {
 }
 
-bool CSerialPort::slotOpenPort(const QString &p_portName)
+bool CPushStorage::slotOpenPort(const QString &p_portName)
 {
     if(m_serialPort->isOpen())
     {
@@ -21,7 +21,7 @@ bool CSerialPort::slotOpenPort(const QString &p_portName)
     }
 
     m_serialPort->setPortName(p_portName);
-    if(!m_serialPort->open(QIODevice::ReadWrite))
+    if(!m_serialPort->open(QIODevice::ReadOnly))
     {
         return false;
     }
@@ -33,13 +33,13 @@ bool CSerialPort::slotOpenPort(const QString &p_portName)
     return true;
 }
 
-void CSerialPort::slotReceiveInfo()
+void CPushStorage::slotReceiveInfo()
 {
     QByteArray readData = m_serialPort->readAll();
     if(!readData.isNull())
     {
         int readType = readData.toInt();
-        emit sendReadSignal(readType);
+        emit pushStorageSignal(readType);
         readData.clear();
     }
 }

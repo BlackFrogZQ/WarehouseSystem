@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(AutoAssemble VERSION 0.1.0)
+project(StorageSystem VERSION 0.1.0)
 
 # 打开我的电脑>属性>高级系统设置>环境变量
 # 新建用户变量 变量名"QT5.12.5"，变量值"qt5.12.5下编译器的目录，比如我的是'C:\Qt\Qt5.12.5\5.12.5\msvc2017_64'"
@@ -59,15 +59,11 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/system)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/para)
 set(paraServerCpp
     src/para/define/paraDef.cpp
-    src/para/define/communicationDef.cpp
-    src/para/define/cameraDef.cpp
+    src/para/define/serialPortDef.cpp
     src/para/define/roiRegionYcgDef.cpp
-    src/para/define/cameraLzDef.cpp
-    src/para/define/roiRegionLzDef.cpp
-    src/para/define/serialPortDef.cpp)
+    src/para/define/roiRegionLzDef.cpp)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/ui)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/hal)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/imageProcess)
 
 file(GLOB libs "lib/halcon12x64/*.lib")
 
@@ -85,11 +81,11 @@ qt5_add_resources(sources qml.qrc)
 #     add_executable(${PROJECT_NAME}
 #         WIN32
 #         ${sources}
-#         assemble.rc)
+#         storage.rc)
 # else()
 #     add_executable(${PROJECT_NAME}
 #         ${sources}
-#         assemble.rc)
+#         storage.rc)
 # endif()
 
 # Specify MSVC UTF-8 encoding
@@ -97,13 +93,13 @@ qt5_add_resources(sources qml.qrc)
 # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_executable(${PROJECT_NAME}
-    # WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
+    WIN32 # If you need a terminal for debug, please comment this statement#是在调试控制台输出还是在终端输出//有顺序要求
     ${paraServerCpp}
     ${sources}
     main.cpp
     ico.rc)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort halLib sysLib halconProcessLib paraLib uiLib) # Qt5 Shared Library
+target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort halLib sysLib paraLib uiLib) # Qt5 Shared Library
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

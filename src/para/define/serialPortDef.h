@@ -4,9 +4,9 @@ namespace TIGER_SerialPortDef
 {
 	struct CSerialPortPara
 	{
-		QString scannerPort;
-		QString indicatorLightPort;
-		CSerialPortPara::CSerialPortPara() : scannerPort("COM5"),indicatorLightPort("COM11"){};
+		QString pushStorageScanner;
+		QString pullStorageScanner;
+		CSerialPortPara::CSerialPortPara() : pushStorageScanner("COM8"), pullStorageScanner("COM10"){};
 	};
 	CSerialPortPara *serialPortParas();
 };

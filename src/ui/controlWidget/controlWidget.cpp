@@ -1,10 +1,6 @@
 ﻿#include "controlWidget.h"
 #include "ui/mainWindow.h"
 #include "ui/setParaWindow/setParaWindow.h"
-#include "ui/assemblyTypeWindow/assemblyTypeWindow.h"
-#include "hal/camera/baslerCamera.h"
-#include "hal/camera/baslerCameraLz.h"
-#include "hal/communication/plcSigDef.h"
 #include "hal/communication/serialPort/serialPortLed.h"
 #include "hal/vm.h"
 #include "system/systemService.h"
@@ -18,10 +14,6 @@ ControlWidget::ControlWidget(): QLabel(nullptr)
     this->setObjectName("ControlWidget");
     this->setStyleSheet(QString("#ControlWidget{%1};").arg(cStyleSheet ));
     initLayout();
-    connect(vm(), &CVM::sigVMStateUpdate, this, &ControlWidget::vmStateUpdate);
-    connect(vm(),&CVM::sigPlcSigUpdate,this,&ControlWidget::countUpdate);
-    connect(vm(), &CVM::sigRunType, this, &ControlWidget::setRunTtpe);
-    vmStateUpdate();
 }
 
 ControlWidget::~ControlWidget()
@@ -61,9 +53,9 @@ void ControlWidget::initLayout()
     connect(m_startRun, &QPushButton::clicked, this, [=](){vm()->autoWork(); });
     m_crashStop = new QPushButton(cnStr("停止运行"));
     setAttr(m_crashStop);
-    connect(m_crashStop, &QPushButton::clicked, this, [=](){
-        if(vm()->vmState() == vmIdle){return;}
-        vm()->stopWork();});
+    // connect(m_crashStop, &QPushButton::clicked, this, [=](){
+    //     if(vm()->vmState() == vmIdle){return;}
+    //     vm()->stopWork();});
 
     //装配型号
     QLabel *pLabelYcgType = new QLabel;
@@ -76,15 +68,6 @@ void ControlWidget::initLayout()
     m_lzType->setPlaceholderText(cnStr("螺柱型号"));
     m_assemblyType = new QPushButton(cnStr("选择装配类型"));
     setAttr(m_assemblyType);
-    connect(m_assemblyType, &QPushButton::clicked, this, [=](){
-        CAssemblyType pAssemblyType;
-        int item;
-        if(pAssemblyType.getCurrentItem(item) == true)
-        {
-            m_ycgType->setText(cYcgTypeName[item]);
-            m_lzType->setText(cLzTypeName[item]);
-            controlPara()->m_runType = item+1;
-        }});
 
     //扭矩
     QLabel *pLabelTwist = new QLabel;
@@ -100,7 +83,6 @@ void ControlWidget::initLayout()
     twist->setAlignment(Qt::AlignCenter);
     twist->setStyleSheet(cStyleSheet);
     twist->setFocusPolicy(Qt::NoFocus);
-    connect(twist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ControlWidget::setTwistPara);
     //系统参数设置
     m_systemPara = new QPushButton(cnStr("系统参数设置"));
     setAttr(m_systemPara);
@@ -140,12 +122,15 @@ void ControlWidget::initLayout()
     pLayoutButton->addWidget(m_reset, 0, 0, 1, 2);
     pLayoutButton->addWidget(m_startRun, 0, 2, 1, 2);
     pLayoutButton->addWidget(m_crashStop, 0, 4, 1, 2);
+
     pLayoutButton->addWidget(m_ycgType, 1, 0, 1, 2);
     pLayoutButton->addWidget(m_lzType, 1, 2, 1, 2);
     pLayoutButton->addWidget(m_assemblyType, 1, 4, 1, 2);
+
     pLayoutButton->addWidget(pLabelTwist, 2, 0, 1, 2);
     pLayoutButton->addWidget(twist, 2, 2, 1, 2);
     pLayoutButton->addWidget(m_systemPara, 2, 4, 1, 2);
+
     pLayoutButton->addWidget(pLabelAll, 3, 0, 1, 1);
     pLayoutButton->addWidget(m_allCount, 3, 1, 1, 1);
     pLayoutButton->addWidget(pLabelOk, 3, 2, 1, 1);
@@ -156,118 +141,4 @@ void ControlWidget::initLayout()
     pLayoutButton->setSizeConstraint(QGridLayout::SetMinimumSize);
     this->setMinimumSize(pLayoutButton->sizeHint());
     this->setLayout(pLayoutButton);
-}
-
-void ControlWidget::vmStateUpdate()
-{
-    switch (vm()->vmState())
-    {
-    case vmIdle:
-        m_reset->setEnabled(true);
-        m_crashStop->setEnabled(true);
-        m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
-        led()->setAll(CLED::clsON, CLED::clsOFF, CLED::clsOFF, CLED::clsOFF);
-        break;
-    case vmReset:
-        m_reset->setEnabled(false);
-        m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(false);
-        led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
-        break;
-    case vmAutoWork:
-        m_reset->setEnabled(false);
-        m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(true);
-        led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
-        break;
-    default:
-        m_reset->setEnabled(false);
-        m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(false);
-        led()->setAll(CLED::clsOFF, CLED::clsOFF, CLED::clsFlashed, CLED::clsFlashed);
-        break;
-    }
-}
-
-void ControlWidget::countUpdate()
-{
-    myInfo << masterData()->hold(cphRunType);
-    myInfo << masterData()->hold(cphYCGType);
-    myInfo << masterData()->hold(cphLZType);
-    myInfo << masterData()->hold(cphTwist);
-    myInfo << masterData()->hold(cphAllCount);
-    myInfo << masterData()->hold(cphOkCount);
-    int allCount = masterData()->hold(cphAllCount);
-    int okCount = masterData()->hold(cphOkCount);
-    int ngCount = allCount - okCount;
-    m_allCount->setText(QString::number(allCount));
-    m_okCount->setText(QString::number(okCount));
-    m_ngCount->setText(QString::number(ngCount));
-}
-
-void ControlWidget::setRunTtpe(QByteArray p_runType)
-{
-    if(vm()->vmState() == vmAutoWork)
-    {
-        return;
-    }
-
-    if(p_runType.left(2).toInt() > typeTotalCount)
-    {
-        m_lzType->clear();
-        m_lzType->setText(cLzTypeName[p_runType.toInt() - typeTotalCount - 1]);
-    }
-    else
-    {
-        m_ycgType->clear();
-        m_ycgType->setText(cYcgTypeName[p_runType.toInt() - 1]);
-    }
-
-    if(!(m_lzType->text().isEmpty() || m_ycgType->text().isEmpty()))
-    {
-        if(cYcgTypeName.indexOf(m_ycgType->text()) == cLzTypeName.indexOf(m_lzType->text()) )
-        {
-            if(vm()->vmState() == vmIdle){m_startRun->setEnabled(true);}
-            m_assemblyType->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
-            controlPara()->m_runType = cYcgTypeName.indexOf(m_ycgType->text()) + 1;
-            myInfo << cnStr("类型匹配成功");
-        }
-        else
-        {
-            m_startRun->setEnabled(false);
-            m_assemblyType->setStyleSheet("QLabel{background-color:rgb(255,0,0)}");
-            myInfo << cnStr("类型匹配失败");
-        }
-    }
-}
-
-void ControlWidget::setTwistPara(double p_twistPara)
-{
-    if(p_twistPara < 1)
-    {
-        p_twistPara = 1;
-    }
-    else if(p_twistPara > 5)
-    {
-        p_twistPara = 5;
-    }
-    controlPara()->m_twist = p_twistPara * 10;
-}
-
-
-
-CControlPara* controlPara()
-{
-    static CControlPara gPortState;
-    return &gPortState;
-}
-
-quint16 CControlPara::runType() const
-{
-    return m_runType;
-}
-
-quint16 CControlPara::twist() const
-{
-    return m_twist;
 }

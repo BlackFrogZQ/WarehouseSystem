@@ -1,5 +1,0 @@
-include_directories(${PROJECT_SOURCE_DIR}/include/pylon5)
-file(GLOB pylon5LIBS  "${PROJECT_SOURCE_DIR}/lib/pylon5x64/*.lib")
-aux_source_directory(. DIR_SYSTEM_SRCS)
-add_library(baslerCameraLib ${DIR_SYSTEM_SRCS})
-target_link_libraries(baslerCameraLib ${pylon5LIBS})

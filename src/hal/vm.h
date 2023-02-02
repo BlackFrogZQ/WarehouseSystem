@@ -1,10 +1,12 @@
 #pragma once
-#include "vmDef.h"
 #include "communication/serialPort/typeDef.h"
 #include <QObject>
+
 class CModbusMaster;
 class CSerialPort;
+class CPushStorage;
 class IAction;
+
 class CVM:public QObject
 {
     friend class CVmControl;
@@ -18,25 +20,20 @@ public:
     void autoWork();
     void stopWork();
 
-    CVMState vmState() const;
-
 signals:
     void sigVMStateUpdate();
     void sigPlcSigUpdate();
-    void sigRunType(QByteArray p_runType);
+    void sigRunType(const int &p_readType);
+    void sigPushStorageType(const int &p_readType);
 
 protected:
     CVM(QObject* p = nullptr);
     ~CVM();
-    void changeState(CVMState nextState);
-    void setRunType(QByteArray p_readType);
 
 protected:
     CModbusMaster* m_pMaster;
-    IAction* m_pResetAction;
-    IAction* m_pAutoWorkAction;
-    CVMState m_state;
 
     CSerialPort* m_pSerialPort;
+    CPushStorage* m_pPushStorage;
 };
 CVM* vm();

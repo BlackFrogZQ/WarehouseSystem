@@ -103,7 +103,7 @@ void CSetParaWindow::setShowNode(CParaNode *p_node)
 bool CSetParaWindow::isSave()
 {
     m_bIsSave = false;
-    this->exec();
+    // this->exec();
     return m_bIsSave;
 }
 

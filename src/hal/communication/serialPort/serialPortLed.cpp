@@ -12,7 +12,7 @@ CLED::CLED():m_isSending(false)
     connect(m_pSerialPort, &QSerialPort::errorOccurred, this, [this]{ myDebug << "modbusMaster error:" << m_pSerialPort->errorString(); },Qt::QueuedConnection);
     connect(m_pSerialPort, &QSerialPort::readyRead, this, &CLED::slotReceive,Qt::QueuedConnection);
 
-    m_pSerialPort->setPortName(TIGER_SerialPortDef::serialPortParas()->indicatorLightPort);
+    m_pSerialPort->setPortName(TIGER_SerialPortDef::serialPortParas()->pushStorageScanner);
     if(m_pSerialPort->open(QIODevice::ReadWrite))
     {
         m_pSerialPort->setBaudRate(9600, QSerialPort::AllDirections);

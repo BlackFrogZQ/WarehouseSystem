@@ -3,7 +3,8 @@
 #include "mainWindowDef.h"
 #include "system/basic.h"
 #include "controlWidget/controlWidget.h"
-#include "stateLedWidget/plcStateLed.h"
+#include "stateLedWidget/ycgStateLed.h"
+#include "stateLedWidget/assembleStateLed.h"
 using namespace std;
 
 class QLabel;
@@ -19,28 +20,11 @@ public:
     void initLayout();
     void printMsg(QString p_msg);
 
-public slots:
-    void slotVideoImage(double p_YcgExposureTime, double p_LzExposureTime);
-    void slotUpdateYcgImage(const QImage &p_image);
-    void slotUpdateLzImage(const QImage &p_image);
-    bool slotGrabYcgImage();
-    bool slotGrabLzImage();
-    bool slotYcgImageDiscern(bool &p_direction);
-    bool slotLzImageDiscern(bool &p_direction);
-
 protected:
-    QLabel *m_ycgImageLabel;
-    QLabel *m_lzImageLabel;
-
     QTextBrowser *m_pOutMsg;
     ControlWidget *m_controlWidget;
-    CPlcStateLed *m_plcStateLed;
-
-    QImage m_ycgImage;
-    QImage m_lzImage;
-
-    QPainterPath m_ycgRoiPath;
-    QPainterPath m_lzRoiPath;
+    CYcgStateLed *m_ycgStateLed;
+    CAssembleStateLed *m_assembleStateLed;
 };
 
 CMainWindow *mainWindow();

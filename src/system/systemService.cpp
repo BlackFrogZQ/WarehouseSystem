@@ -2,12 +2,8 @@
 #include "logSystem/logDef.h"
 #include "ui/basic.h"
 #include "para/para.h"
-#include "hal/camera/baslerCamera.h"
-#include "hal/camera/baslerCameraLz.h"
 #include "hal/communication/serialPort/serialPortLed.h"
 #include "hal/vm.h"
-#include "para/define/cameraDef.h"
-#include "para/define/cameraLzDef.h"
 #include "ui/mainWindow.h"
 #include <HalconCpp.h>
 #include <QDateTime>
@@ -76,8 +72,8 @@ void CVmControl::updateUiImage(const QImage &p_image)
 {
     if (mainWindow() != nullptr)
     {
-        mainWindow()->slotUpdateYcgImage(p_image);
-        mainWindow()->slotUpdateLzImage(p_image);
+        // mainWindow()->slotUpdateYcgImage(p_image);
+        // mainWindow()->slotUpdateLzImage(p_image);
     }
 }
 
@@ -131,13 +127,6 @@ void initSystemService()
     qInstallMessageHandler(logOutput);
     sys()->load();
     ((CVmControl *)g_sysService)->init();
-
-    baslerCamera()->setIP(TIGER_CameraDef::cameraParas()->ip);
-    baslerCamera()->setExposureTime(TIGER_CameraDef::cameraParas()->exposureTime);
-    baslerCamera()->setHeartbeatTimeout(TIGER_CameraDef::cameraParas()->heartbeatTime);
-    baslerCameraLz()->setIP(TIGER_CameraLzDef::cameraParasLz()->ip);
-    baslerCameraLz()->setExposureTime(TIGER_CameraLzDef::cameraParasLz()->exposureTime);
-    baslerCameraLz()->setHeartbeatTimeout(TIGER_CameraLzDef::cameraParasLz()->heartbeatTime);
 }
 
 void closeSystemService()

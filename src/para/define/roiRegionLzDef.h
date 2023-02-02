@@ -1,21 +1,17 @@
 ﻿#pragma once
+#include "hal/communication/serialPort/typeDef.h"
 
 namespace TIGER_LzRoiDef
 {
 	struct CLzRoiPara
 	{
-		int x;
-		int y;
-		int w;
-		int h;
-		bool isShow;
+		bool assemblyStates[cytMax];
 		CLzRoiPara::CLzRoiPara()
 		{
-			x = 820;
-			y = 800;
-			w = 150;
-			h = 200;
-			isShow = true;
+			for (size_t i = 0; i < cytMax-1; i++)
+			{
+				assemblyStates[i]=false;
+			}
 		};
 	};
 	CLzRoiPara *lzRoiParas();

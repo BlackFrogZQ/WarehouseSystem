@@ -1,21 +1,17 @@
 ﻿#pragma once
+#include "hal/communication/serialPort/typeDef.h"
 
 namespace TIGER_YcgRoiDef
 {
 	struct CYcgRoiPara
 	{
-		int x;
-		int y;
-		int w;
-		int h;
-		bool isShow;
+		bool ycgStates[cytMax];
 		CYcgRoiPara::CYcgRoiPara()
 		{
-			x = 680;
-			y = 450;
-			w = 130;
-			h = 510;
-			isShow = true;
+			for (size_t i = 0; i < cytMax-1; i++)
+			{
+				ycgStates[i]=false;
+			}
 		};
 	};
 	CYcgRoiPara *ycgRoiParas();
