@@ -11,7 +11,7 @@ namespace TIGER_ProcessTool
         {
             //*****************得到最靠近接近开关的延长杆***************
             ReduceDomain(p_image, p_roiRegion, &m_hObject);
-            Threshold(m_hObject, &m_hObject, 100, 255);
+            Threshold(m_hObject, &m_hObject, 200, 255);
             Connection(m_hObject, &m_hObject);
 
             //得到中间的区域

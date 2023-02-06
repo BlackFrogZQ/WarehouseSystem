@@ -14,7 +14,7 @@ namespace TIGER_LzRoiDef
 			x = 820;
 			y = 800;
 			w = 150;
-			h = 200;
+			h = 250;
 			isShow = true;
 		};
 	};

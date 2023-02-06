@@ -84,6 +84,7 @@ void ControlWidget::initLayout()
             m_ycgType->setText(cYcgTypeName[item]);
             m_lzType->setText(cLzTypeName[item]);
             controlPara()->m_runType = item+1;
+            m_startRun->setEnabled(true);
         }});
 
     //扭矩
@@ -140,12 +141,15 @@ void ControlWidget::initLayout()
     pLayoutButton->addWidget(m_reset, 0, 0, 1, 2);
     pLayoutButton->addWidget(m_startRun, 0, 2, 1, 2);
     pLayoutButton->addWidget(m_crashStop, 0, 4, 1, 2);
+
     pLayoutButton->addWidget(m_ycgType, 1, 0, 1, 2);
     pLayoutButton->addWidget(m_lzType, 1, 2, 1, 2);
     pLayoutButton->addWidget(m_assemblyType, 1, 4, 1, 2);
+
     pLayoutButton->addWidget(pLabelTwist, 2, 0, 1, 2);
     pLayoutButton->addWidget(twist, 2, 2, 1, 2);
     pLayoutButton->addWidget(m_systemPara, 2, 4, 1, 2);
+
     pLayoutButton->addWidget(pLabelAll, 3, 0, 1, 1);
     pLayoutButton->addWidget(m_allCount, 3, 1, 1, 1);
     pLayoutButton->addWidget(pLabelOk, 3, 2, 1, 1);
@@ -191,14 +195,16 @@ void ControlWidget::vmStateUpdate()
 
 void ControlWidget::countUpdate()
 {
-    myInfo << masterData()->hold(cphRunType);
-    myInfo << masterData()->hold(cphYCGType);
-    myInfo << masterData()->hold(cphLZType);
-    myInfo << masterData()->hold(cphTwist);
-    myInfo << masterData()->hold(cphAllCount);
-    myInfo << masterData()->hold(cphOkCount);
-    int allCount = masterData()->hold(cphAllCount);
+    if(masterData()->hold(cphAllCount) > tempAllCount)
+    {
+        tempAllCount = masterData()->hold(cphAllCount);
+        return;
+    }
+    int allCount = tempAllCount;
+    allCount = allCount>m_allCount->text().toInt()?allCount:m_allCount->text().toInt();
     int okCount = masterData()->hold(cphOkCount);
+    okCount = okCount>m_okCount->text().toInt()?okCount:m_okCount->text().toInt();
+    okCount = okCount>allCount?allCount:okCount;
     int ngCount = allCount - okCount;
     m_allCount->setText(QString::number(allCount));
     m_okCount->setText(QString::number(okCount));

@@ -27,18 +27,17 @@ public slots:
     bool slotGrabLzImage();
     bool slotYcgImageDiscern(bool &p_direction);
     bool slotLzImageDiscern(bool &p_direction);
+    QString getSaveImagePath(bool p_saveYcg,bool p_isSuccessful) const;
 
 protected:
     QLabel *m_ycgImageLabel;
     QLabel *m_lzImageLabel;
-
     QTextBrowser *m_pOutMsg;
     ControlWidget *m_controlWidget;
     CPlcStateLed *m_plcStateLed;
 
     QImage m_ycgImage;
     QImage m_lzImage;
-
     QPainterPath m_ycgRoiPath;
     QPainterPath m_lzRoiPath;
 };

@@ -6,12 +6,15 @@
 #include "imageProcess/imageProcess.h"
 #include "para/define/roiRegionYcgDef.h"
 #include "para/define/roiRegionLzDef.h"
+#include "system/tool/fileTool.h"
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QTextBrowser>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QDateTime>
+#include <QDir>
 using namespace TIGER_HalconTool;
 using namespace TIGER_ProcessTool;
 
@@ -148,7 +151,13 @@ bool CMainWindow::slotYcgImageDiscern(bool &p_direction)
 {
     if(!slotGrabYcgImage()){return false;}
     TIGER_ProcessTool::CStationMatch stationMatch;
-    if (stationMatch.processImage(true, baslerCamera()->getLastImage(), m_ycgRoiPath))
+    bool isSuccessful = stationMatch.processImage(true, baslerCamera()->getLastImage(), m_ycgRoiPath);
+    QString imagePath = getSaveImagePath(true, isSuccessful);
+    if (!(TIGER_FlieTool::createFile(imagePath) && stationMatch.getMarkImage().save(imagePath)))
+    {
+        myInfo << cnStr("图片保存失败:%1").arg(imagePath);
+    }
+    if (isSuccessful)
     {
         myInfo << cnStr("延长杆处理成功。");
     }
@@ -202,7 +211,13 @@ bool CMainWindow::slotLzImageDiscern(bool &p_direction)
 {
     if(!slotGrabLzImage()){return false;}
     TIGER_ProcessTool::CStationMatch stationMatch;
-    if (stationMatch.processImage(false, baslerCameraLz()->getLastImage(), m_lzRoiPath))
+    bool isSuccessful = stationMatch.processImage(false, baslerCameraLz()->getLastImage(), m_lzRoiPath);
+    QString imagePath = getSaveImagePath(false, isSuccessful);
+    if (!(TIGER_FlieTool::createFile(imagePath) && stationMatch.getMarkImage().save(imagePath)))
+    {
+        myInfo << cnStr("图片保存失败:%1").arg(imagePath);
+    }
+    if (isSuccessful)
     {
         qInfo() << cnStr("螺柱处理成功。");
     }
@@ -214,4 +229,11 @@ bool CMainWindow::slotLzImageDiscern(bool &p_direction)
     slotUpdateLzImage(stationMatch.getMarkImage());
     p_direction = stationMatch.getDirection();
     return true;
+}
+
+
+QString CMainWindow::getSaveImagePath(bool p_saveYcg, bool p_isSuccessful) const
+{
+    QDateTime dateTime = QDateTime::currentDateTime();
+    return cnStr("%1/1.saveImage/").arg(QDir::currentPath())+ dateTime.toString("yyyy.MM.dd/") + (p_saveYcg ? cnStr("延长杆") : cnStr("螺柱"))+ (p_isSuccessful ? "/" : "/error/") + dateTime.toString("hh.mm.ss") + ".jpeg";
 }

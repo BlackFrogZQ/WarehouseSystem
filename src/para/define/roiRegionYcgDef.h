@@ -11,8 +11,8 @@ namespace TIGER_YcgRoiDef
 		bool isShow;
 		CYcgRoiPara::CYcgRoiPara()
 		{
-			x = 680;
-			y = 450;
+			x = 700;
+			y = 400;
 			w = 130;
 			h = 510;
 			isShow = true;

@@ -36,6 +36,7 @@ protected:
     QLabel *m_allCount;
     QLabel *m_okCount;
     QLabel *m_ngCount;
+    int tempAllCount=0;
 };
 
 struct CControlPara
