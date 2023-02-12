@@ -54,7 +54,9 @@ endif()
 
 include_directories(include/halcon12x64 include/halcon12x64/halconcpp)
 include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/src/qtSingleApplication)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/qtSingleApplication)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/system)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/para)
 set(paraServerCpp
@@ -99,7 +101,7 @@ add_executable(${PROJECT_NAME}
     main.cpp
     ico.rc)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} Qt5::Widgets Qt5::Core Qt5::Gui Qt5::SerialPort halLib sysLib paraLib uiLib) # Qt5 Shared Library
+target_link_libraries(${PROJECT_NAME} PRIVATE ${libs} ${Qt5model} qtSingleApplicationLib halLib sysLib paraLib uiLib) # Qt5 Shared Library
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
