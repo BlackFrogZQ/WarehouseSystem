@@ -1,6 +1,7 @@
 build/*
 LogFile/*
 .vscode/*
+1.saveImage/*
 log/*
 lib/halcon12x64/halcon.dll
 xmlDataFileAll.xml

@@ -1,5 +1,6 @@
 ﻿#include "controlWidget.h"
 #include "ui/mainWindow.h"
+#include "ui/inputDialog/inputDialog.h"
 #include "ui/setParaWindow/setParaWindow.h"
 #include "ui/assemblyTypeWindow/assemblyTypeWindow.h"
 #include "hal/camera/baslerCamera.h"
@@ -106,17 +107,30 @@ void ControlWidget::initLayout()
     m_systemPara = new QPushButton(cnStr("系统参数设置"));
     setAttr(m_systemPara);
     connect(m_systemPara, &QPushButton::clicked, this, [=](){
-        CSetParaWindow setParaWindow;
-        setParaWindow.setShowNode(TIGER_ParaDef::paraRootNode());
-        bool isSave = setParaWindow.isSave();
-        isSave ? sys()->save() : sys()->load();
-        if(isSave)
+        QString pwStr = CInputDialog::getText(this->windowTitle(), cnStr("请输入密码"), QLineEdit::Password,QString()).trimmed();
+        if (pwStr.size() == 0)
         {
-            if(QMessageBox::Yes ==
-            QMessageBox::question(this, cnStr("加载参数"), cnStr("是否重启系统加载参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
+            return;
+        }
+
+        if (pwStr == cnStr("123"))
+        {
+            CSetParaWindow setParaWindow;
+            setParaWindow.setShowNode(TIGER_ParaDef::paraRootNode());
+            bool isSave = setParaWindow.isSave();
+            isSave ? sys()->save() : sys()->load();
+            if(isSave)
             {
-                sys()->restartSys();
+                if(QMessageBox::Yes ==
+                QMessageBox::question(this, cnStr("加载参数"), cnStr("是否重启系统加载参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
+                {
+                    sys()->restartSys();
+                }
             }
+        }
+        else
+        {
+            showToolTip(this, cnStr("密码错误"));
         }});
 
     //计数
