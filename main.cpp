@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     instance.setWindowIcon(QIcon(":res/storage.png"));
     initSystemService();
     CMainWindow w;
-    w.setWindowTitle("StorageSystem");
+    w.setWindowTitle("storage");
     // w.show();
     w.showFullScreen();
     w.setWindowState(Qt::WindowMaximized);

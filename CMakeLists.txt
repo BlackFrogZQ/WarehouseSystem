@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(StorageSystem VERSION 0.1.0)
+project(storage VERSION 0.1.0)
 
 # 打开我的电脑>属性>高级系统设置>环境变量
 # 新建用户变量 变量名"QT5.12.5"，变量值"qt5.12.5下编译器的目录，比如我的是'C:\Qt\Qt5.12.5\5.12.5\msvc2017_64'"
