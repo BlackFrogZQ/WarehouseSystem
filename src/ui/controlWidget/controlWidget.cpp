@@ -14,7 +14,7 @@
 #include <QDoubleSpinBox>
 #include <QMessageBox>
 
-ControlWidget::ControlWidget(): QLabel(nullptr)
+ControlWidget::ControlWidget(): QLabel(nullptr), matchSucceeded(false)
 {
     this->setObjectName("ControlWidget");
     this->setStyleSheet(QString("#ControlWidget{%1};").arg(cStyleSheet ));
@@ -86,6 +86,12 @@ void ControlWidget::initLayout()
             m_lzType->setText(cLzTypeName[item]);
             controlPara()->m_runType = item+1;
             m_startRun->setEnabled(true);
+            beforeAllCount = masterData()->hold(cphAllCount);
+            beforeOkCount = masterData()->hold(cphOkCount);
+            m_allCount->setText(QString::number(0));
+            m_okCount->setText(QString::number(0));
+            m_ngCount->setText(QString::number(0));
+            matchSucceeded = true;
         }});
 
     //扭矩
@@ -121,11 +127,12 @@ void ControlWidget::initLayout()
             isSave ? sys()->save() : sys()->load();
             if(isSave)
             {
-                if(QMessageBox::Yes ==
-                QMessageBox::question(this, cnStr("加载参数"), cnStr("是否重启系统加载参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
-                {
-                    sys()->restartSys();
-                }
+                // if(QMessageBox::Yes ==
+                // QMessageBox::question(this, cnStr("加载参数"), cnStr("是否重启系统加载参数？"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No))
+                // {
+                //     sys()->restartSys();
+                // }
+                QMessageBox::information(this, cnStr("提示"), cnStr("请重启软件加载参数！"));
             }
         }
         else
@@ -209,14 +216,18 @@ void ControlWidget::vmStateUpdate()
 
 void ControlWidget::countUpdate()
 {
+    if(matchSucceeded == false)
+    {
+        return;
+    }
     if(masterData()->hold(cphAllCount) > tempAllCount)
     {
         tempAllCount = masterData()->hold(cphAllCount);
         return;
     }
-    int allCount = tempAllCount;
+    int allCount = tempAllCount - beforeAllCount;
     allCount = allCount>m_allCount->text().toInt()?allCount:m_allCount->text().toInt();
-    int okCount = masterData()->hold(cphOkCount);
+    int okCount = masterData()->hold(cphOkCount) - beforeOkCount;
     okCount = okCount>m_okCount->text().toInt()?okCount:m_okCount->text().toInt();
     okCount = okCount>allCount?allCount:okCount;
     int ngCount = allCount - okCount;
@@ -251,6 +262,12 @@ void ControlWidget::setRunTtpe(QByteArray p_runType)
             m_assemblyType->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
             controlPara()->m_runType = cYcgTypeName.indexOf(m_ycgType->text()) + 1;
             myInfo << cnStr("类型匹配成功");
+            beforeAllCount = masterData()->hold(cphAllCount);
+            beforeOkCount = masterData()->hold(cphOkCount);
+            m_allCount->setText(QString::number(0));
+            m_okCount->setText(QString::number(0));
+            m_ngCount->setText(QString::number(0));
+            matchSucceeded = true;
         }
         else
         {

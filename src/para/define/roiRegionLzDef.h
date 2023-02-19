@@ -11,7 +11,7 @@ namespace TIGER_LzRoiDef
 		bool isShow;
 		CLzRoiPara::CLzRoiPara()
 		{
-			x = 820;
+			x = 810;
 			y = 800;
 			w = 150;
 			h = 250;

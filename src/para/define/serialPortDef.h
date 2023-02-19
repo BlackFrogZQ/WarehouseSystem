@@ -6,7 +6,7 @@ namespace TIGER_SerialPortDef
 	{
 		QString scannerPort;
 		QString indicatorLightPort;
-		CSerialPortPara::CSerialPortPara() : scannerPort("COM5"),indicatorLightPort("COM6"){};
+		CSerialPortPara::CSerialPortPara() : scannerPort("COM5"),indicatorLightPort("COM8"){};
 	};
 	CSerialPortPara *serialPortParas();
 };

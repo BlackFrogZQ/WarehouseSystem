@@ -37,6 +37,9 @@ protected:
     QLabel *m_okCount;
     QLabel *m_ngCount;
     int tempAllCount=0;
+    int beforeAllCount=0;
+    int beforeOkCount=0;
+    bool matchSucceeded;
 };
 
 struct CControlPara
