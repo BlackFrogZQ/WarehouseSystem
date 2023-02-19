@@ -3,6 +3,7 @@
 #include "ui/setParaWindow/setParaWindow.h"
 #include "hal/vm.h"
 #include "para/define/roiRegionYcgDef.h"
+#include "system/systemService.h"
 #include <QVBoxLayout>
 
 CYcgStateLed::CYcgStateLed(QWidget *parent) : QLabel(parent)
@@ -13,7 +14,7 @@ CYcgStateLed::CYcgStateLed(QWidget *parent) : QLabel(parent)
     {
         auto led = new QLabel(name);
         led->setStyleSheet("QLabel{background-color:rgb(0,255,0)}QLabel:disabled{background:transparent};");
-        led->setFixedHeight(100);
+        led->setFixedHeight(80);
         led->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         led->setAlignment(Qt::AlignCenter);
         return led;
@@ -41,7 +42,7 @@ void CYcgStateLed::initLayout()
         plcStateLayout->addWidget(m_states[i], i/5, i%5, 1, 1);
     }
     plcStateLayout->setMargin(0);
-    plcStateLayout->setVerticalSpacing(100);
+    plcStateLayout->setVerticalSpacing(80);
     plcStateLayout->setSizeConstraint(QGridLayout::SetMaximumSize);
     plcStateWidget->setLayout(plcStateLayout);
 
@@ -92,7 +93,7 @@ void CYcgStateLed::ycgReduceStorage(const int &p_readType)
     TIGER_YcgRoiDef::ycgRoiParas()->ycgStates[p_readType-1] = false;
     CSetParaWindow setParaWindow;
     setParaWindow.setShowNode(TIGER_ParaDef::paraRootNode());
-    setParaWindow.isSave();
+    sys()->save();
 }
 
 void CYcgStateLed::ycgAddStorage(const int &p_readType)
@@ -105,5 +106,5 @@ void CYcgStateLed::ycgAddStorage(const int &p_readType)
     TIGER_YcgRoiDef::ycgRoiParas()->ycgStates[p_readType-1] = true;
     CSetParaWindow setParaWindow;
     setParaWindow.setShowNode(TIGER_ParaDef::paraRootNode());
-    setParaWindow.isSave();
+    sys()->save();
 }

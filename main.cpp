@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     w.setWindowTitle("StorageSystem");
     // w.show();
     w.showFullScreen();
+    w.setWindowState(Qt::WindowMaximized);
     instance.setActivationWindow(&w);
     int code = instance.exec();
     closeSystemService();
