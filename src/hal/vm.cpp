@@ -56,8 +56,10 @@ CVM::CVM(QObject *p)
 
 CVM::~CVM()
 {
+    delPtr(m_pMaster);
     delPtr(m_pResetAction);
     delPtr(m_pAutoWorkAction);
+    delPtr(m_pSerialPort);
 }
 
 CVMState CVM::vmState() const

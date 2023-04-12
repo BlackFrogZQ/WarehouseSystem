@@ -191,24 +191,28 @@ void ControlWidget::vmStateUpdate()
         m_reset->setEnabled(true);
         m_crashStop->setEnabled(true);
         m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
+        m_assemblyType->setEnabled(true);
         led()->setAll(CLED::clsON, CLED::clsOFF, CLED::clsOFF, CLED::clsOFF);
         break;
     case vmReset:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
+        m_assemblyType->setEnabled(true);
         led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
         break;
     case vmAutoWork:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(true);
+        m_assemblyType->setEnabled(false);
         led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
         break;
     default:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
         m_crashStop->setEnabled(false);
+        m_assemblyType->setEnabled(false);
         led()->setAll(CLED::clsOFF, CLED::clsOFF, CLED::clsFlashed, CLED::clsFlashed);
         break;
     }

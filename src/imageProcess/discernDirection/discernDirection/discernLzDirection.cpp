@@ -166,7 +166,7 @@ namespace TIGER_ProcessTool
         }
         catch (HException &except)
         {
-            m_error = except.ErrorMessage().Text();
+            m_error = cnStr("识别参数错误");
         }
         return false;
     }

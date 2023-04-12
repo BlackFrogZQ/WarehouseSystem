@@ -27,8 +27,8 @@ CLED::~CLED()
 {
     if(m_pSerialPort->isOpen())
     {
-        setAll(clsOFF,clsOFF,clsOFF,clsOFF);
-        while(isSending()){}
+        // setAll(clsOFF,clsOFF,clsOFF,clsOFF);
+        // while(isSending()){}
         m_pSerialPort->clear();
         m_pSerialPort->close();
     }

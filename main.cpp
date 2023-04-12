@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     {
         initSystemService();
         CMainWindow w;
-        w.setWindowTitle("AutoAssemble");
+        w.setWindowTitle("assemble");
         // w.show();
         w.showFullScreen();
         w.setWindowState(Qt::WindowMaximized);

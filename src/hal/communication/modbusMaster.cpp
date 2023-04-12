@@ -22,6 +22,9 @@ CModbusMaster::CModbusMaster(QObject *p) : QObject(p), m_pServer(nullptr), m_isC
 
 CModbusMaster::~CModbusMaster()
 {
+    if (m_pServer)
+        m_pServer->disconnectDevice();
+    delPtr(m_pServer);
 }
 
 bool CModbusMaster::sendDisColis(int p_addr, bool p_value)
