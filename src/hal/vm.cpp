@@ -23,19 +23,22 @@ CVM::CVM(QObject *p)
     CActionCreater creater(this);
     m_pResetAction = creater.resetAction();
     m_pAutoWorkAction = creater.autoWorkAction();
-    connect(m_pResetAction, &IAction::sigEnd, [this]{
+    m_pStopWorkAction = creater.stopAction();
+    connect(m_pResetAction, &IAction::sigEnd, [this]
+            {
         if(m_state == vmReset)
         {
             changeState(vmIdle);
         } });
-    connect(m_pAutoWorkAction, &IAction::sigEnd, [this]{
+    connect(m_pAutoWorkAction, &IAction::sigEnd, [this]
+            {
         if(m_state == vmAutoWork)
         {
             changeState(vmIdle);
         } });
 
     m_pMaster = new CModbusMaster(this);
-    connect(m_pMaster,&CModbusMaster::sigDataUpdate,this,&CVM::sigPlcSigUpdate);
+    connect(m_pMaster, &CModbusMaster::sigDataUpdate, this, &CVM::sigPlcSigUpdate);
     const auto cIP = TIGER_PCDef::pcParas()->serverIp;
     const auto cPort = TIGER_PCDef::pcParas()->serverPort;
     const auto cAddr = TIGER_PCDef::pcParas()->serverAddr;
@@ -51,7 +54,7 @@ CVM::CVM(QObject *p)
     m_pSerialPort = new CSerialPort(this);
     m_pSerialPort->setPort(portName);
     myInfo << (m_pSerialPort->slotOpenPort() ? cnStr("扫描仪连接成功") : cnStr("扫描仪连接失败"));
-    connect(m_pSerialPort,&CSerialPort::sendReadSignal,this,&CVM::setRunType);
+    connect(m_pSerialPort, &CSerialPort::sendReadSignal, this, &CVM::setRunType);
 }
 
 CVM::~CVM()
@@ -99,6 +102,11 @@ void CVM::stopWork()
 {
     assert(m_state == vmAutoWork);
     m_pAutoWorkAction->stop();
+    m_connection = connect(m_pAutoWorkAction, &IAction::sigEnd, this, [this]()
+                            {
+                            disconnect(m_connection);
+                            m_pStopWorkAction->start();
+                            });
 }
 
 void CVM::changeState(CVMState nextState)

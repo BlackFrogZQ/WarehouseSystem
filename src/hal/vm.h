@@ -5,13 +5,13 @@
 class CModbusMaster;
 class CSerialPort;
 class IAction;
-class CVM:public QObject
+class CVM : public QObject
 {
     friend class CVmControl;
     Q_OBJECT
 public:
-    bool sendDisColis(int p_addr,bool p_value);
-    bool sendHold(int p_addr,quint16 p_value);
+    bool sendDisColis(int p_addr, bool p_value);
+    bool sendHold(int p_addr, quint16 p_value);
 
     void reset();
     void stoReset();
@@ -26,17 +26,18 @@ signals:
     void sigRunType(QByteArray p_runType);
 
 protected:
-    CVM(QObject* p = nullptr);
+    CVM(QObject *p = nullptr);
     ~CVM();
     void changeState(CVMState nextState);
     void setRunType(QByteArray p_readType);
 
 protected:
-    CModbusMaster* m_pMaster;
-    IAction* m_pResetAction;
-    IAction* m_pAutoWorkAction;
+    CModbusMaster *m_pMaster;
+    IAction *m_pResetAction;
+    IAction *m_pAutoWorkAction;
+    IAction *m_pStopWorkAction;
     CVMState m_state;
-
-    CSerialPort* m_pSerialPort;
+    QMetaObject::Connection m_connection;
+    CSerialPort *m_pSerialPort;
 };
-CVM* vm();
+CVM *vm();

@@ -5,7 +5,7 @@ class CAutoWorkAction : public IAction
 {
     friend class CAutoWorkIdleState;
     friend class CSendRunType;
-    friend class CAutoStop;
+    friend class CPlcFinish;
     friend class CWaitYCGVision;
     friend class CWaitLZVision;
     friend class CYCGVision;
@@ -23,7 +23,7 @@ public:
 
 protected:
     IActionState* m_idle;
-    IActionState* m_autoStop;
+    IActionState* m_plcFinish;
     IActionState* m_sendRunType;
     quint16 m_runType;
     quint16 m_twist;

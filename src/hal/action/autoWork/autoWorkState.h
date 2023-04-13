@@ -80,7 +80,7 @@ public:
     virtual void runing() override;
 };
 
-class CAutoStop:public CAutoWorkIdleState
+class CPlcFinish:public CAutoWorkIdleState
 {
     Q_OBJECT
 public:

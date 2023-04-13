@@ -24,6 +24,7 @@ public:
     CActionCreater(CVM *p_vm);
     IAction *resetAction();
     IAction *autoWorkAction();
+    IAction *stopAction();
 
 protected:
     CVM *m_pVM;

@@ -10,7 +10,7 @@
 void CSendRunType::run()
 {
     // dirTest()->init(17,17,50);
-    assert(masterData()->colis(cpcAuotRun) == false);
+    assert(masterData()->colis(cpcStartRun) == false);
     vm()->sendHold(cphRunType, m_action->m_runType);
     vm()->sendHold(cphTwist, m_action->m_twist);
     QTimer::singleShot(10, this, [this]{ runing(); });
@@ -24,14 +24,14 @@ void CSendRunType::runing()
     }
     if (masterData()->hold(cphRunType) == m_action->m_runType)
     {
-        if ((masterData()->colis(cpcAuotRun) == false) && (autoRun()->getAutoRun() == false))
+        if ((masterData()->colis(cpcStartRun) == false) && (autoRun()->getAutoRun() == false))
         {
-            vm()->sendDisColis(cpdcAuotRun,true);
+            vm()->sendDisColis(cpdcStartRun,true);
         }
         else
         {
             autoRun()->isAutoRun = true;
-            vm()->sendDisColis(cpdcAuotRun,false);
+            vm()->sendDisColis(cpdcStartRun,false);
             changeState(m_action->m_waitYCGVision);
             return;
         }
