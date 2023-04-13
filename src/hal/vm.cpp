@@ -102,11 +102,9 @@ void CVM::stopWork()
 {
     assert(m_state == vmAutoWork);
     m_pAutoWorkAction->stop();
-    m_connection = connect(m_pAutoWorkAction, &IAction::sigEnd, this, [this]()
-                            {
+    m_connection = connect(m_pAutoWorkAction, &IAction::sigEnd, this, [this](){
                             disconnect(m_connection);
-                            m_pStopWorkAction->start();
-                            });
+                            m_pStopWorkAction->start();});
 }
 
 void CVM::changeState(CVMState nextState)

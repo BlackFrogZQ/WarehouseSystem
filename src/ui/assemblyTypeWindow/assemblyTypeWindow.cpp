@@ -24,7 +24,7 @@ void CAssemblyType::initLayout()
 {
     m_pChoiceType = new QTableWidget(this);
     m_pChoiceType->setColumnCount(2);
-    m_pChoiceType->setRowCount(23);
+    m_pChoiceType->setRowCount(25);
     m_pChoiceType->setHorizontalHeaderLabels(QStringList() << cnStr("延长杆型号")<< cnStr("螺柱型号"));
     m_pChoiceType->setStyleSheet("QHeaderView::section{background:transparent; color:black;}");
     m_pChoiceType->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
