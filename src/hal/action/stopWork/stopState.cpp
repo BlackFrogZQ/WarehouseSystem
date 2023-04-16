@@ -56,7 +56,6 @@ void CStopWaitFinisedState::runing()
 {
     if (masterData()->disColis(cpdcStopRun) == false && masterData()->colis(cpcStopRun) == false)
     {
-        myInfo << cnStr("plc停止完成") ;
         changeState(m_resetAction->m_idle);
     }
     else
