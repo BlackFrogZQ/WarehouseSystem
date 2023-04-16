@@ -11,7 +11,7 @@ CAssemblyType::CAssemblyType(QWidget *parent) : QDialog(parent)
     setWindowFlag(Qt::WindowCloseButtonHint, false);
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
     setWindowTitle(cnStr("选择匹配类型"));
-    setFixedSize(600, 800);
+    setFixedSize(600, 840);
     setAutoFillBackground(true);
     initLayout();
 }
