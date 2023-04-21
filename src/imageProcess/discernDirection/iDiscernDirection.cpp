@@ -12,7 +12,6 @@ namespace TIGER_ProcessTool
         m_error.clear();
         try
         {
-            //****5、判断方向*****
             //模型初始化
             HTuple preprocessParamFileName, retrainedModelFileName;
             switch (p_AssembleType)

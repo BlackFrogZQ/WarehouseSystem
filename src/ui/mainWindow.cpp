@@ -1,6 +1,7 @@
 ﻿#include "mainWindow.h"
 #include "hal/camera/baslerCamera.h"
 #include "hal/camera/baslerCameraLz.h"
+#include "hal/communication/serialPort/typeDef.h"
 #include "system/tool/halconTool.h"
 #include "system/basic.h"
 #include "imageProcess/imageProcess.h"
@@ -235,5 +236,5 @@ bool CMainWindow::slotLzImageDiscern(bool &p_direction)
 QString CMainWindow::getSaveImagePath(bool p_saveYcg, bool p_isSuccessful) const
 {
     QDateTime dateTime = QDateTime::currentDateTime();
-    return cnStr("%1/1.saveImage/").arg(QDir::currentPath())+ dateTime.toString("yyyy.MM.dd/") + (p_saveYcg ? cnStr("延长杆") : cnStr("螺柱"))+ (p_isSuccessful ? "/" : "/error/") + dateTime.toString("hh.mm.ss") + ".jpeg";
+    return cnStr("%1/1.saveImage/").arg(QDir::currentPath()) + dateTime.toString("yyyy.MM.dd/") + cAssembleTypeName[controlPara()->runType()-1] + "/" + (p_saveYcg ? cnStr("延长杆") : cnStr("螺柱"))+ (p_isSuccessful ? "/" : "/error/") + dateTime.toString("hh.mm.ss") + ".jpeg";
 }
