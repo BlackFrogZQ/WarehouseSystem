@@ -13,6 +13,15 @@ namespace TIGER_ProcessTool
         bool getDirection() const { return m_direction; };
 
     protected:
+        enum CAssembleType
+        {
+            catYcg,
+            catLz,
+            catMax
+        };
+        bool getDirection(const CAssembleType &p_AssembleType, const HalconCpp::HObject &p_region, bool &p_direction);
+
+    protected:
         bool m_direction;
     };
 }

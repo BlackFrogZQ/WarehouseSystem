@@ -55,9 +55,14 @@ endif()
 include_directories(include/halcon12x64 include/halcon12x64/halconcpp)
 include_directories(${PROJECT_SOURCE_DIR}/src/qtSingleApplication)
 include_directories(${PROJECT_SOURCE_DIR}/src)
+file(GLOB libs "lib/halcon12x64/*.lib")
+
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/qtSingleApplication)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/system)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/ui)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/hal)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/imageProcess)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/para)
 set(paraServerCpp
     src/para/define/paraDef.cpp
@@ -67,21 +72,17 @@ set(paraServerCpp
     src/para/define/cameraLzDef.cpp
     src/para/define/roiRegionLzDef.cpp
     src/para/define/serialPortDef.cpp)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/ui)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/hal)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/imageProcess)
 
-file(GLOB libs "lib/halcon12x64/*.lib")
+set(srcCpp
+    src/ui/mainWindow.cpp)
 
-# set(srcCpp
-#     src/ui/mainWindow.cpp)
+qt5_add_resources(sources qml.qrc)
+
 
 # set(sources
 #     ${paraServerCpp}
 #     main.cpp
 # )
-
-qt5_add_resources(sources qml.qrc)
 
 # if(${isRelease})
 #     add_executable(${PROJECT_NAME}

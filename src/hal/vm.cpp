@@ -24,18 +24,16 @@ CVM::CVM(QObject *p)
     m_pResetAction = creater.resetAction();
     m_pAutoWorkAction = creater.autoWorkAction();
     m_pStopWorkAction = creater.stopAction();
-    connect(m_pResetAction, &IAction::sigEnd, [this]
-            {
+    connect(m_pResetAction, &IAction::sigEnd, [this]{
         if(m_state == vmReset)
         {
             changeState(vmIdle);
-        } });
-    connect(m_pAutoWorkAction, &IAction::sigEnd, [this]
-            {
+        }});
+    connect(m_pAutoWorkAction, &IAction::sigEnd, [this]{
         if(m_state == vmAutoWork)
         {
             changeState(vmIdle);
-        } });
+        }});
 
     m_pMaster = new CModbusMaster(this);
     connect(m_pMaster, &CModbusMaster::sigDataUpdate, this, &CVM::sigPlcSigUpdate);
@@ -102,9 +100,11 @@ void CVM::stopWork()
 {
     assert(m_state == vmAutoWork);
     m_pAutoWorkAction->stop();
-    m_connection = connect(m_pAutoWorkAction, &IAction::sigEnd, this, [this](){
-                            disconnect(m_connection);
-                            m_pStopWorkAction->start();});
+    m_connection = connect(m_pAutoWorkAction, &IAction::sigEnd, this, [this]()
+                    {
+                        disconnect(m_connection);
+                        m_pStopWorkAction->start();
+                    });
 }
 
 void CVM::changeState(CVMState nextState)

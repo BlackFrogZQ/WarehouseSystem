@@ -10,7 +10,7 @@ enum CPlcColis : unsigned char
     cpcStartRun,
     cpcPlcFinish,
     cpcStopRun,
-    cpcTemp2,
+    cpcLowGasPressure,
     cpcTemp3,
     cpcMax
 };

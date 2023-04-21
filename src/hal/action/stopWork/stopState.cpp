@@ -13,15 +13,17 @@ CStopIdleState::~CStopIdleState()
 {
 }
 
+
 void CStopIdleState::run()
 {
-    myInfo << cnStr("设备停止") ;
+    myInfo << cnStr("自动工作结束") ;
     if (masterData()->disColis(cpdcStopRun))
     {
         vm()->sendDisColis(cpdcStopRun,false);
     }
     emit m_resetAction->sigEnd();
 }
+
 
 void CStopWaitResponseState::run()
 {
@@ -31,7 +33,6 @@ void CStopWaitResponseState::run()
     vm()->sendDisColis(cpdcStopRun,true);
     QTimer::singleShot(10,this,[this]{runing();});
 }
-
 void CStopWaitResponseState::runing()
 {
     if (masterData()->colis(cpcStopRun))
@@ -44,6 +45,7 @@ void CStopWaitResponseState::runing()
     }
 }
 
+
 void CStopWaitFinisedState::run()
 {
     assert (masterData()->disColis(cpdcStopRun) == true);
@@ -51,7 +53,6 @@ void CStopWaitFinisedState::run()
     vm()->sendDisColis(cpdcStopRun,false);
     QTimer::singleShot(10,this,[this]{runing();});
 }
-
 void CStopWaitFinisedState::runing()
 {
     if (masterData()->disColis(cpdcStopRun) == false && masterData()->colis(cpcStopRun) == false)

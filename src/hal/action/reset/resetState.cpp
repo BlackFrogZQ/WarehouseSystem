@@ -12,6 +12,7 @@ CResetIdleState::~CResetIdleState()
 {
 }
 
+
 void CResetIdleState::run()
 {
     myInfo << cnStr("复位结束") ;
@@ -22,6 +23,7 @@ void CResetIdleState::run()
     emit m_resetAction->sigEnd();
 }
 
+
 void CResetWaitResponseState::run()
 {
     assert (masterData()->colis(cpcReset) == false);
@@ -30,7 +32,6 @@ void CResetWaitResponseState::run()
     vm()->sendDisColis(cpdcReset,true);
     QTimer::singleShot(10,this,[this]{runing();});
 }
-
 void CResetWaitResponseState::runing()
 {
     if (m_resetAction->m_bStop)
@@ -49,6 +50,7 @@ void CResetWaitResponseState::runing()
     }
 }
 
+
 void CResetWaitFinisedState::run()
 {
     assert (masterData()->disColis(cpdcReset) == true);
@@ -56,7 +58,6 @@ void CResetWaitFinisedState::run()
     vm()->sendDisColis(cpdcReset,false);
     QTimer::singleShot(10,this,[this]{runing();});
 }
-
 void CResetWaitFinisedState::runing()
 {
     if (m_resetAction->m_bStop)

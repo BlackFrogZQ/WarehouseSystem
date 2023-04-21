@@ -26,7 +26,7 @@ protected slots:
 protected:
     QPushButton *m_reset;
     QPushButton *m_startRun;
-    QPushButton *m_crashStop;
+    QPushButton *m_stopRun;
     QPushButton *m_systemPara;
 
     QLineEdit *m_ycgType;

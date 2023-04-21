@@ -22,6 +22,14 @@ void CSendRunType::runing()
         changeState(m_action->m_idle);
         return;
     }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
+        changeState(m_action->m_idle);
+        return;
+    }
+
     if (masterData()->hold(cphRunType) == m_action->m_runType)
     {
         if ((masterData()->colis(cpcStartRun) == false) && (autoRun()->getAutoRun() == false))
@@ -51,6 +59,18 @@ void CWaitLZVision::runing()
         changeState(m_action->m_idle);
         return;
     }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
+        changeState(m_action->m_idle);
+        return;
+    }
+    if(masterData()->colis(cpcPlcFinish))
+    {
+        changeState(m_action->m_plcFinish);
+        return;
+    }
 
     if (masterData()->colis(cpcLZVision))
     {
@@ -74,6 +94,13 @@ void CLZVision::runing()
 {
     if (m_action->m_bStop)
     {
+        changeState(m_action->m_idle);
+        return;
+    }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
         changeState(m_action->m_idle);
         return;
     }
@@ -111,6 +138,13 @@ void CWaitLZAction::runing()
 {
     if (m_action->m_bStop)
     {
+        changeState(m_action->m_idle);
+        return;
+    }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
         changeState(m_action->m_idle);
         return;
     }

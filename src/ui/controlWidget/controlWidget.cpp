@@ -56,15 +56,33 @@ void ControlWidget::initLayout()
     //PLC控制
     m_reset = new QPushButton(cnStr("复位"));
     setAttr(m_reset);
-    connect(m_reset, &QPushButton::clicked, this, [=](){vm()->reset(); });
+    connect(m_reset, &QPushButton::clicked, this, [=]()
+    {
+        vm()->reset();
+    });
+
     m_startRun = new QPushButton(cnStr("开始运行"));
     setAttr(m_startRun);
-    connect(m_startRun, &QPushButton::clicked, this, [=](){vm()->autoWork(); });
-    m_crashStop = new QPushButton(cnStr("停止运行"));
-    setAttr(m_crashStop);
-    connect(m_crashStop, &QPushButton::clicked, this, [=](){
-        if(vm()->vmState() == vmIdle){return;}
-        vm()->stopWork();});
+    connect(m_startRun, &QPushButton::clicked, this, [=]()
+    {
+        if(masterData()->colis(cpcLowGasPressure)==true)
+        {
+            QMessageBox::critical(this, cnStr("警告"), cnStr("气压不足，请检查气泵是否打开！"));
+            return;
+        }
+        vm()->autoWork();
+    });
+
+    m_stopRun = new QPushButton(cnStr("停止运行"));
+    setAttr(m_stopRun);
+    connect(m_stopRun, &QPushButton::clicked, this, [=]()
+    {
+        if(vm()->vmState() == vmIdle)
+        {
+            return;
+        }
+        vm()->stopWork();
+    });
 
     //装配型号
     QLabel *pLabelYcgType = new QLabel;
@@ -77,7 +95,8 @@ void ControlWidget::initLayout()
     m_lzType->setPlaceholderText(cnStr("螺柱型号"));
     m_assemblyType = new QPushButton(cnStr("选择装配类型"));
     setAttr(m_assemblyType);
-    connect(m_assemblyType, &QPushButton::clicked, this, [=](){
+    connect(m_assemblyType, &QPushButton::clicked, this, [=]()
+    {
         CAssemblyType pAssemblyType;
         int item;
         if(pAssemblyType.getCurrentItem(item) == true)
@@ -92,7 +111,8 @@ void ControlWidget::initLayout()
             m_okCount->setText(QString::number(0));
             m_ngCount->setText(QString::number(0));
             matchSucceeded = true;
-        }});
+        }
+    });
 
     //扭矩
     QLabel *pLabelTwist = new QLabel;
@@ -109,10 +129,12 @@ void ControlWidget::initLayout()
     twist->setStyleSheet(cStyleSheet);
     twist->setFocusPolicy(Qt::NoFocus);
     connect(twist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &ControlWidget::setTwistPara);
+
     //系统参数设置
     m_systemPara = new QPushButton(cnStr("系统参数设置"));
     setAttr(m_systemPara);
-    connect(m_systemPara, &QPushButton::clicked, this, [=](){
+    connect(m_systemPara, &QPushButton::clicked, this, [=]()
+    {
         QString pwStr = CInputDialog::getText(this->windowTitle(), cnStr("请输入密码"), QLineEdit::Password,QString()).trimmed();
         if (pwStr.size() == 0)
         {
@@ -138,7 +160,8 @@ void ControlWidget::initLayout()
         else
         {
             showToolTip(this, cnStr("密码错误"));
-        }});
+        }
+    });
 
     //计数
     QLabel *pLabelAll = new QLabel;
@@ -161,7 +184,7 @@ void ControlWidget::initLayout()
     QGridLayout *pLayoutButton = new QGridLayout();
     pLayoutButton->addWidget(m_reset, 0, 0, 1, 2);
     pLayoutButton->addWidget(m_startRun, 0, 2, 1, 2);
-    pLayoutButton->addWidget(m_crashStop, 0, 4, 1, 2);
+    pLayoutButton->addWidget(m_stopRun, 0, 4, 1, 2);
 
     pLayoutButton->addWidget(m_ycgType, 1, 0, 1, 2);
     pLayoutButton->addWidget(m_lzType, 1, 2, 1, 2);
@@ -189,7 +212,7 @@ void ControlWidget::vmStateUpdate()
     {
     case vmIdle:
         m_reset->setEnabled(true);
-        m_crashStop->setEnabled(true);
+        m_stopRun->setEnabled(true);
         m_startRun->setEnabled(m_ycgType->text().isEmpty() == true ? false : true);
         m_assemblyType->setEnabled(true);
         led()->setAll(CLED::clsON, CLED::clsOFF, CLED::clsOFF, CLED::clsOFF);
@@ -197,21 +220,21 @@ void ControlWidget::vmStateUpdate()
     case vmReset:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(false);
+        m_stopRun->setEnabled(false);
         m_assemblyType->setEnabled(true);
         led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
         break;
     case vmAutoWork:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(true);
+        m_stopRun->setEnabled(true);
         m_assemblyType->setEnabled(false);
         led()->setAll(CLED::clsOFF, CLED::clsFlashed, CLED::clsOFF, CLED::clsOFF);
         break;
     default:
         m_reset->setEnabled(false);
         m_startRun->setEnabled(false);
-        m_crashStop->setEnabled(false);
+        m_stopRun->setEnabled(false);
         m_assemblyType->setEnabled(false);
         led()->setAll(CLED::clsOFF, CLED::clsOFF, CLED::clsFlashed, CLED::clsFlashed);
         break;
@@ -247,7 +270,7 @@ void ControlWidget::setRunTtpe(QByteArray p_runType)
         return;
     }
 
-    if(p_runType.left(2).toInt() > typeTotalCount)
+    if(p_runType.left(2).toInt()>typeTotalCount)
     {
         m_lzType->clear();
         m_lzType->setText(cLzTypeName[p_runType.toInt() - typeTotalCount - 1]);
@@ -260,24 +283,30 @@ void ControlWidget::setRunTtpe(QByteArray p_runType)
 
     if(!(m_lzType->text().isEmpty() || m_ycgType->text().isEmpty()))
     {
-        if(cYcgTypeName.indexOf(m_ycgType->text()) == cLzTypeName.indexOf(m_lzType->text()) )
+        if((cYcgTypeName.indexOf(m_ycgType->text()) == cLzTypeName.indexOf(m_lzType->text())) ||
+            (cLzTypeName.indexOf(m_lzType->text())==12 && cLzTypeName.indexOf(m_lzType->text())==11))
         {
-            if(vm()->vmState() == vmIdle){m_startRun->setEnabled(true);}
+            if(vm()->vmState() == vmIdle)
+            {
+                m_startRun->setEnabled(true);
+            }
             m_assemblyType->setStyleSheet("QLabel{background-color:rgb(0,255,0)}");
-            controlPara()->m_runType = cYcgTypeName.indexOf(m_ycgType->text()) + 1;
+            controlPara()->m_runType = cLzTypeName.indexOf(m_lzType->text())+1;
             myInfo << cnStr("类型匹配成功");
+            matchSucceeded = true;
+
             beforeAllCount = masterData()->hold(cphAllCount);
             beforeOkCount = masterData()->hold(cphOkCount);
             m_allCount->setText(QString::number(0));
             m_okCount->setText(QString::number(0));
             m_ngCount->setText(QString::number(0));
-            matchSucceeded = true;
         }
         else
         {
             m_startRun->setEnabled(false);
             m_assemblyType->setStyleSheet("QLabel{background-color:rgb(255,0,0)}");
             myInfo << cnStr("类型匹配失败");
+            matchSucceeded = false;
         }
     }
 }

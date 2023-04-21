@@ -16,9 +16,9 @@ CAutoWorkIdleState::~CAutoWorkIdleState()
 {
 }
 
+
 void CAutoWorkIdleState::run()
 {
-    myInfo << cnStr("自动工作结束");
     if (masterData()->disColis(cpdcYCGAction))
     {
         vm()->sendDisColis(cpdcYCGAction, false);
@@ -51,6 +51,13 @@ void CWaitYCGVision::runing()
         changeState(m_action->m_idle);
         return;
     }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
+        changeState(m_action->m_idle);
+        return;
+    }
     if(masterData()->colis(cpcPlcFinish))
     {
         changeState(m_action->m_plcFinish);
@@ -67,6 +74,7 @@ void CWaitYCGVision::runing()
     }
 }
 
+
 void CYCGVision::run()
 {
     assert(masterData()->colis(cpcYCGVision) == true);
@@ -82,6 +90,14 @@ void CYCGVision::runing()
         changeState(m_action->m_idle);
         return;
     }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
+        changeState(m_action->m_idle);
+        return;
+    }
+
     if (masterData()->hold(cphYCGType) == cddUndef)
     {
         if (masterData()->colis(cpcYCGVision) == false)
@@ -103,6 +119,7 @@ void CYCGVision::runing()
                        { runing(); });
 }
 
+
 void CWaitYCGAction::run()
 {
     assert(masterData()->colis(cpcYCGVision) == false);
@@ -116,6 +133,13 @@ void CWaitYCGAction::runing()
 {
     if (m_action->m_bStop)
     {
+        changeState(m_action->m_idle);
+        return;
+    }
+    else if(masterData()->colis(cpcLowGasPressure))
+    {
+        myInfo << cnStr("气压不足，设备准备自动停止运行");
+        vm()->stopWork();
         changeState(m_action->m_idle);
         return;
     }
@@ -150,18 +174,14 @@ void CPlcFinish::run()
 }
 void CPlcFinish::runing()
 {
-    if (m_action->m_bStop)
-    {
-        changeState(m_action->m_idle);
-        return;
-    }
-
     if (masterData()->colis(cpcPlcFinish))
     {
         vm()->sendDisColis(cpdcPlcFinish, true);
     }
     else
     {
+        myInfo << cnStr("长时间无工件装配，设备准备自动停止运行");
+        vm()->stopWork();
         autoRun()->isAutoRun = false;
         vm()->sendDisColis(cpdcPlcFinish, false);
         changeState(m_action->m_idle);

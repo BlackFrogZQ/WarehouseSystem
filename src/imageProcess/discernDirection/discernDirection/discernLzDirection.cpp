@@ -9,7 +9,7 @@ namespace TIGER_ProcessTool
         m_error.clear();
         try
         {
-            //*****************得到最靠近接近传感器的螺柱***************
+            //****1、得到螺柱*****
             ReduceDomain(p_image, p_roiRegion, &m_hObject);
             Threshold(m_hObject, &m_hObject, 200, 255);
             Connection(m_hObject, &m_hObject);
@@ -57,68 +57,16 @@ namespace TIGER_ProcessTool
             FillUp(m_hObject, &m_hObject);
             ShapeTrans(m_hObject, &m_hObject, "convex");
 
-            //*****************判断位姿***************
-            //判断selectedRegionsOriginal是否在中间
-            SelectShape(selectedRegionsOriginal, &tempRegion, "column", "and", columnRoi - 30, columnRoi + 30);
-            CountObj(tempRegion, &numberAll);
-            if(numberAll.I()==0)
-            {
-                m_error = cnStr("姿势错误");
-                return false;
-            }
-
-            //根据矩形度来判断
-            HTuple rectangularity, circularity;
-            Rectangularity(m_hObject, &rectangularity);
-            Circularity(m_hObject, &circularity);
-            if ((rectangularity.D()<0.81) || (circularity>0.63))
-            {
-                m_error = cnStr("姿势错误");
-                return false;
-            }
-
-            //*****************判断方向***************
-            //得到小面积区域
+            //****2、得到底端*****
             SmallestRectangle1(m_hObject, &row1, &column1, &row2, &column2);
-            GenRectangle1(&tempRegion, row1+(row2-row1)/2, column1, row2, column2);
+            GenRectangle1(&tempRegion, row2-100, column1, row2, column2);
             Intersection(m_hObject, tempRegion, &m_hObject);
 
-            //得到小面积区域两端区域的长度比值
-            SmallestRectangle1(m_hObject, &row1, &column1, &row2, &column2);
+            //****3、剪裁图片*****
+            ReduceDomain(p_image, m_hObject, &m_hObject);
+            CropDomain(m_hObject, &m_hObject);
 
-            HObject RectangleBehind;
-            HTuple RowBehind1, ColumnBehind1, RowBehind2, ColumnBehind2, LengthBehind;
-            GenRectangle1(&RectangleBehind, row1, column1, row1+3, column2);
-            Intersection(m_hObject, RectangleBehind, &RectangleBehind);
-            SmallestRectangle1(RectangleBehind, &RowBehind1, &ColumnBehind1, &RowBehind2, &ColumnBehind2);
-            LengthBehind = ColumnBehind2 - ColumnBehind1;
-
-            HObject RectangleFront;
-            HTuple RowFront1, ColumnFront1, RowFront2, ColumnFront2, LengthFront;
-            GenRectangle1(&RectangleFront, row2-3, column1, row2, column2);
-            Intersection(m_hObject, RectangleFront, &RectangleFront);
-            SmallestRectangle1(RectangleFront, &RowFront1, &ColumnFront1, &RowFront2, &ColumnFront2);
-            LengthFront = ColumnFront2 - ColumnFront1;
-
-            HTuple lengthRadio1, lengthRadio2, lengthRadi;
-            lengthRadio1 = LengthFront / (LengthBehind.TupleReal());
-            lengthRadio2 = LengthBehind / (LengthFront.TupleReal());
-            lengthRadi = lengthRadio1;
-            if (lengthRadio2 < lengthRadio1)
-            {
-                lengthRadi = lengthRadio2;
-            }
-
-            //根据长度比值判断方向
-            if (lengthRadi.D()>0.8)
-            {
-                m_direction = false;
-            }
-            else
-            {
-                m_direction = true;
-            }
-            return true;
+            return getDirection(catLz, m_hObject, m_direction);
         }
         catch (HException &except)
         {
