@@ -36,6 +36,10 @@ const QStringList cYcgTypeName = {cnStr("M6*78"), cnStr("M6*73"), cnStr("M6*63")
                                   cnStr("M8*81"), cnStr("M8*78"), cnStr("M8*73"), cnStr("M8*63"), cnStr("M8*53"), cnStr("M8*43"),
                                   cnStr("M10*78"), cnStr("M10*78"), cnStr("M10*73"), cnStr("M10*63"), cnStr("M10*53"), cnStr("M10*43"), cnStr("M10*33"),
                                   cnStr("M12*78"), cnStr("M12*73"), cnStr("M12*68"), cnStr("M12*63"), cnStr("M12*53"), cnStr("M12*43"), cnStr("M12*38")};
+const int cYcgLong[25][2] = {{335, 355}, {0, 600}, {0, 600}, {0, 600}, {145, 165}, 
+                             {0, 600}, {390, 410}, {360, 380}, {300, 320}, {195, 215}, {135, 155}, 
+                             {390, 410}, {390, 410}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, 
+                             {390, 410}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, };
 
 enum CLzType : unsigned char
 {
@@ -70,7 +74,10 @@ const QStringList cLzTypeName = { cnStr("M6*15"), cnStr("M6*20"), cnStr("M6*30")
                                   cnStr("M8*12"), cnStr("M8*15"), cnStr("M8*20"), cnStr("M8*30"), cnStr("M8*40"), cnStr("M8*50"),
                                   cnStr("M10*12"), cnStr("M10*15"), cnStr("M10*20"), cnStr("M10*30"), cnStr("M10*40"), cnStr("M10*50"), cnStr("M10*60"),
                                   cnStr("M12*15"), cnStr("M12*20"), cnStr("M12*25"), cnStr("M12*30"), cnStr("M12*40"), cnStr("M12*50"), cnStr("M12*55")};
-
+const int cLzLong[25][2] = {{70, 95}, {0, 600}, {0, 600}, {0, 600}, {265, 290}, 
+                             {0, 600}, {75, 95}, {105, 125}, {160, 180}, {215, 235}, {275, 295}, 
+                             {55, 75}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, 
+                             {75, 95}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, {0, 600}, };
 
 const QStringList cAssembleTypeName = { cnStr("M6L78-M6L15"), cnStr("M6L73-M6L20"), cnStr("M6L63-M6L30"), cnStr("M6L53-M6L40"), cnStr("M6L43-M6L50"),
                                         cnStr("M8L81-M8L12"), cnStr("M8L78-M8L15"), cnStr("M8L73-M8L20"), cnStr("M8L63-M8L30"), cnStr("M8L53-M8L40"), cnStr("M8L43-M8L50"),

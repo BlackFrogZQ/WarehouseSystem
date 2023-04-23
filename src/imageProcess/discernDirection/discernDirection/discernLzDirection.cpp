@@ -1,5 +1,7 @@
 ﻿#include "discernLzDirection.h"
 #include "system/tool/halconTool.h"
+#include "ui/controlWidget/controlWidget.h"
+#include "hal/communication/serialPort/typeDef.h"
 
 namespace TIGER_ProcessTool
 {
@@ -57,12 +59,20 @@ namespace TIGER_ProcessTool
             FillUp(m_hObject, &m_hObject);
             ShapeTrans(m_hObject, &m_hObject, "convex");
 
-            //****2、得到底端*****
+            //****2、判断长度*****
+            InnerRectangle1(m_hObject, &row1, &column1, &row2, &column2);
+            double pLong = (row2-row1).D();
+            if((pLong<cLzLong[controlPara()->runType()-1][0])||(pLong>cLzLong[controlPara()->runType()-1][1]))
+            {
+                return false;
+            }
+
+            //****3、得到底端*****
             SmallestRectangle1(m_hObject, &row1, &column1, &row2, &column2);
             GenRectangle1(&tempRegion, row2-100, column1, row2, column2);
             Intersection(m_hObject, tempRegion, &m_hObject);
 
-            //****3、剪裁图片*****
+            //****4、剪裁图片*****
             ReduceDomain(p_image, m_hObject, &m_hObject);
             CropDomain(m_hObject, &m_hObject);
 
