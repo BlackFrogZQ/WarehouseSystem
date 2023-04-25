@@ -34,7 +34,7 @@ enum CYcgType : unsigned char
 };
 const QStringList cYcgTypeName = {cnStr("M6L78"), cnStr("M6L73"), cnStr("M6L63"), cnStr("M6L53"), cnStr("M6L43"), 
                                   cnStr("M8L81"), cnStr("M8L78"), cnStr("M8L73"), cnStr("M8L63"), cnStr("M8L53"), cnStr("M8L43"), 
-                                  cnStr("M10L78"), cnStr("M10L78"), cnStr("M10L73"), cnStr("M10L63"), cnStr("M10L53"), cnStr("M10L43"), cnStr("M10L33"), 
+                                  cnStr("M10L78"), cnStr("    "), cnStr("M10L73"), cnStr("M10L63"), cnStr("M10L53"), cnStr("M10L43"), cnStr("M10L33"), 
                                   cnStr("M12L78"), cnStr("M12L73"), cnStr("M12L68"), cnStr("M12L63"), cnStr("M12L53"), cnStr("M12L43"), cnStr("M12L38")};
 const QStringList cAssembleTypeName = {cnStr("M6L78-M6L15"), cnStr("M6L73-M6L20"), cnStr("M6L63-M6L30"), cnStr("M6L53-M6L40"), cnStr("M6L43-M6L50"), 
                                   cnStr("M8L81-M8L12"), cnStr("M8L78-M8L15"), cnStr("M8L73-M8L20"), cnStr("M8L63-M8L30"), cnStr("M8L53-M8L40"), cnStr("M8L43-M8L50"), 
