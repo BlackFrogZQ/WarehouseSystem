@@ -65,23 +65,24 @@ void ControlWidget::initLayout()
     setAttr(m_startRun);
     connect(m_startRun, &QPushButton::clicked, this, [=]()
     {
-        if(masterData()->colis(cpcLowGasPressure)==true)
+        if(masterData()->colis(cpcLowGasPressure))
         {
             QMessageBox::critical(this, cnStr("警告"), cnStr("气压不足，请检查气泵是否打开！"));
-            return;
         }
-        vm()->autoWork();
+        else
+        {
+            vm()->autoWork();
+        }
     });
 
     m_stopRun = new QPushButton(cnStr("停止运行"));
     setAttr(m_stopRun);
     connect(m_stopRun, &QPushButton::clicked, this, [=]()
     {
-        if(vm()->vmState() == vmIdle)
+        if(vm()->vmState() == vmAutoWork)
         {
-            return;
+            vm()->stopWork();
         }
-        vm()->stopWork();
     });
 
     //装配型号
