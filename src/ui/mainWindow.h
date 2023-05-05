@@ -2,7 +2,6 @@
 #include "basic.h"
 #include "mainWindowDef.h"
 #include "system/basic.h"
-#include "controlWidget/controlWidget.h"
 #include "stateLedWidget/ycgStateLed.h"
 #include "stateLedWidget/assembleStateLed.h"
 using namespace std;
@@ -22,7 +21,6 @@ public:
 
 protected:
     QTextBrowser *m_pOutMsg;
-    ControlWidget *m_controlWidget;
     CYcgStateLed *m_ycgStateLed;
     CAssembleStateLed *m_assembleStateLed;
 };

@@ -22,7 +22,6 @@ CMainWindow::CMainWindow(QWidget *parent)
 {
     g_pMainWindow = this;
     // setFixedSize(1920, 1080);// 1626 1236
-    m_controlWidget = new ControlWidget;
     m_ycgStateLed = new CYcgStateLed;
     m_assembleStateLed = new CAssembleStateLed;
     initLayout();
@@ -31,7 +30,6 @@ CMainWindow::CMainWindow(QWidget *parent)
 CMainWindow::~CMainWindow()
 {
     delPtr(m_pOutMsg);
-    delPtr(m_controlWidget);
     delPtr(m_ycgStateLed);
     delPtr(m_assembleStateLed);
 }
