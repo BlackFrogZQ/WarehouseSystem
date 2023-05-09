@@ -24,7 +24,7 @@ CYcgStateLed::CYcgStateLed(QWidget *parent) : QLabel(parent)
         m_states[i] = getLed(cYcgTypeName[i]);
     }
     initLayout();
-    connect(vm(), &CVM::sigRunType, this, &CYcgStateLed::ycgReduceStorage);
+    connect(vm(), &CVM::sigPullStorageType, this, &CYcgStateLed::ycgReduceStorage);
     connect(vm(), &CVM::sigPushStorageType, this, &CYcgStateLed::ycgAddStorage);
 }
 

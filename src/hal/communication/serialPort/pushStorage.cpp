@@ -3,7 +3,10 @@
 CPushStorage::CPushStorage(QObject *p): QObject(p)
 {
     m_serialPort = new QSerialPort(this);
-    connect(m_serialPort, &QSerialPort::errorOccurred, this, [this]{ myDebug << "modbusMaster error:" << m_serialPort->errorString(); });
+    connect(m_serialPort, &QSerialPort::errorOccurred, this, [this]
+    {
+        myDebug << "CPushStorage error:" << m_serialPort->errorString();
+    });
     connect(m_serialPort, &QSerialPort::readyRead, this, &CPushStorage::slotReceiveInfo);
 }
 

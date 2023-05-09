@@ -6,20 +6,20 @@
 #include <QSerialPortInfo>
 #include <QString>
 
-class CSerialPort : public QObject
+class CPullStorage : public QObject
 {
     Q_OBJECT
 
 public:
-    CSerialPort(QObject* p = nullptr);
-    ~CSerialPort();
+    CPullStorage(QObject* p = nullptr);
+    ~CPullStorage();
 
 public slots:
     bool slotOpenPort(const QString &p_portName);
     void slotReceiveInfo();
 
 signals:
-    void sendReadSignal(const int &p_readType);
+    void pullStorageSignal(const int &p_readType);
 
 private:
     QSerialPort* m_serialPort;

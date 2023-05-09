@@ -2,7 +2,6 @@
 #include "logSystem/logDef.h"
 #include "ui/basic.h"
 #include "para/para.h"
-#include "hal/communication/serialPort/serialPortLed.h"
 #include "hal/vm.h"
 #include "ui/mainWindow.h"
 #include <HalconCpp.h>
@@ -131,7 +130,6 @@ void initSystemService()
 
 void closeSystemService()
 {
-    led()->setAll(CLED::clsOFF, CLED::clsOFF, CLED::clsOFF, CLED::clsOFF);
     sys()->save();
     delete g_sysService;
     g_sysService = nullptr;

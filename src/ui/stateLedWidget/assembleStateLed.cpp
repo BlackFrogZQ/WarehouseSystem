@@ -24,7 +24,7 @@ CAssembleStateLed::CAssembleStateLed(QWidget *parent) : QLabel(parent)
         m_states[i] = getLed(cAssembleTypeName[i]);
     }
     initLayout();
-    connect(vm(), &CVM::sigRunType, this, &CAssembleStateLed::assembleReduceStorage);
+    connect(vm(), &CVM::sigPullStorageType, this, &CAssembleStateLed::assembleReduceStorage);
     connect(vm(), &CVM::sigPushStorageType, this, &CAssembleStateLed::assembleAddStorage);
 }
 

@@ -1,17 +1,20 @@
-﻿#include "serialPort.h"
+﻿#include "pullStorage.h"
 
-CSerialPort::CSerialPort(QObject *p): QObject(p)
+CPullStorage::CPullStorage(QObject *p): QObject(p)
 {
     m_serialPort = new QSerialPort(this);
-    connect(m_serialPort, &QSerialPort::errorOccurred, this, [this]{ myDebug << "modbusMaster error:" << m_serialPort->errorString(); });
-    connect(m_serialPort, &QSerialPort::readyRead, this, &CSerialPort::slotReceiveInfo);
+    connect(m_serialPort, &QSerialPort::errorOccurred, this, [this]
+    {
+        myDebug << "CPullStorage error:" << m_serialPort->errorString();
+    });
+    connect(m_serialPort, &QSerialPort::readyRead, this, &CPullStorage::slotReceiveInfo);
 }
 
-CSerialPort::~CSerialPort()
+CPullStorage::~CPullStorage()
 {
 }
 
-bool CSerialPort::slotOpenPort(const QString &p_portName)
+bool CPullStorage::slotOpenPort(const QString &p_portName)
 {
     if(m_serialPort->isOpen())
     {
@@ -33,13 +36,13 @@ bool CSerialPort::slotOpenPort(const QString &p_portName)
     return true;
 }
 
-void CSerialPort::slotReceiveInfo()
+void CPullStorage::slotReceiveInfo()
 {
     QByteArray readData = m_serialPort->readAll();
     if(!readData.isNull())
     {
         int readType = readData.toInt();
-        emit sendReadSignal(readType);
+        emit pullStorageSignal(readType);
         readData.clear();
     }
 }
